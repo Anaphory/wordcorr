@@ -90,6 +90,33 @@ def read_user_data_from_sprlist(sprlist1):
         ["id", "famname", "name", "affiliations", "email"],
         userlist))
  
+def read_collection_data_from_sprlist(sprlist1):
+    colllistprelim = []           #create a list of all data filled in by the user
+    stripstring = ''
+    colllist = []
+    for i in range(6, 24):                  #for all Collection metadata
+        try:                                #try to append the data to preliminary datalist
+            colllistprelim.append(sprlist1[i][3])
+        except IndexError:                  #if a field is empty
+            colllistprelim.append('*')      #append a '*' instead
+    for i in range(0, len(colllistprelim)): #for this preliminary datalist
+        stripstring = colllistprelim[i]     #convert to string
+        list = stripstring.strip()         #strip off trailing empty spaces (prevent linebreaks in xml document
+        list = list.strip('"')
+        colllist.append(list)               #append to datalist
+    collection = {"collname":colllist[0],"collsname":colllist[1],
+                "glosslg":colllist[4], "lgcode1":colllist[5], "glosslg2":colllist[6],
+                "lgcode2":colllist[7], "creatorrole":colllist[2],
+                "rights":colllist[15], "copyright":colllist[16]}
+    collection["contributor"] = colllist[3]
+    collection["description"] = colllist[9]
+    collection["remarks"] = colllist[10]
+    collection["keywords"] = (colllist[8])
+    collection["coverage"] = colllist[13]
+    collection["published"] = [i for i in colllist[11:13] if i]
+    collection["stable"] = colllist[14]
+    return collection
+
 parser = argparse.ArgumentParser(
     description = """This program will take a tab delimited version of an excel table
     and convert it to xml importable into WordCorr""")
@@ -121,23 +148,7 @@ for i, line in enumerate(inp):	#read each line in the input and do the following
 userdata = read_user_data_from_sprlist(sprlist1)               
 
 #COLLECTION INFORMATION:
-colllistprelim = []           #create a list of all data filled in by the user
-stripstring = ''
-colllist = []
-for i in range(6, 24):                  #for all Collection metadata
-    try:                                #try to append the data to preliminary datalist
-        colllistprelim.append(sprlist1[i][3])
-    except IndexError:                  #if a field is empty
-        colllistprelim.append('*')      #append a '*' instead
-for i in range(0, len(colllistprelim)): #for this preliminary datalist
-    stripstring = colllistprelim[i]     #convert to string
-    list = stripstring.strip()         #strip off trailing empty spaces (prevent linebreaks in xml document
-    list = list.strip('"')
-    colllist.append(list)               #append to datalist
-collection = {"collname":colllist[0],"collsname":colllist[1],
-              "glosslg":colllist[4], "lgcode1":colllist[5], "glosslg2":colllist[6],
-              "lgcode2":colllist[7], "creatorrole":colllist[2],
-              "rights":colllist[15], "copyright":colllist[16]}
+collection = read_collection_data_from_sprlist(sprlist1)
 #vvvvvvvvvvv Varieties Information vvvvvvvvvvvv
 #CREATES LISTS CONTAINING THE INFORMATION FROM THE VARIETIES
 
@@ -213,27 +224,27 @@ glosslang = ' gloss-language="%(glosslg)s" gloss-language-code="%(lgcode1)s" sec
 outp.write(glosslang)
 
 #contributor
-contributor = ' <contributor>%s</contributor>\n'  %(colllist[3])
+contributor = ' <contributor>%s</contributor>\n'  %collection["contributor"]
 #print contributor
 outp.write(contributor)
 
 #description
-description = '<description>%s</description>\n'   %(colllist[9])
+description = '<description>%s</description>\n'   %collection["description"]
 #print description
 outp.write(description)
 
 #collection remarks:
-collrem = '        <remarks>%s</remarks>\n' % (colllist[10])
+collrem = '        <remarks>%s</remarks>\n' % collection["remarks"]
 #print collrem
 outp.write(collrem)
 
 #keywords
-keywords = ' <keywords>%s</keywords>\n'   %(colllist[8])
+keywords = ' <keywords>%s</keywords>\n'   % collection["keywords"]
 #print keywords
 outp.write(keywords)
 
 #coverage
-coverage = ' <coverage>%s</coverage>\n'   %(colllist[13])
+coverage = ' <coverage>%s</coverage>\n'   % collection["coverage"]
 #print coverage
 outp.write(coverage)
 
@@ -241,25 +252,14 @@ outp.write(coverage)
 #This creates the input for the 'published source' field.
 #To avoid empty spaces or lines, the script takes into account which of the two lines
 #in the spreadsheet are filled.
-if colllist[11] != '' and colllist[12] != '':
-    publishedsource = ' <published-source>%s</published-source>\n'    %(colllist[11]+', '+colllist[12])
-#    print publishedsource
-    outp.write(publishedsource)
-elif colllist[11] != '' and colllist[12] == '':
-    publishedsource = ' <published-source>%s</published-source>\n'    %(colllist[11])
-#    print publishedsource
-    outp.write(publishedsource)
-elif colllist[11] == '' and colllist[12] != '':
-    publishedsource = ' <published-source>%s</published-source>\n'    %(colllist[12])
-#    print publishedsource
-    outp.write(publishedsource)
+if collection["published"]:
+    publishedsource = ' <published-source>%s</published-source>\n'    % ", ".join(collection["published"])
 else:
     publishedsource = ' <published-source />\n'    
-#    print publishedsource
-    outp.write(publishedsource)    
+outp.write(publishedsource)    
 
 #stable-copy-location
-stablecopylocation = ' <stable-copy-location>%s</stable-copy-location>\n'  %(colllist[14]) 
+stablecopylocation = ' <stable-copy-location>%s</stable-copy-location>\n'  % collection["stable"]
 #print stablecopylocation
 outp.write(stablecopylocation)
 
