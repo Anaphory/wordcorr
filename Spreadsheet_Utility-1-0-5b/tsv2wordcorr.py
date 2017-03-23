@@ -117,455 +117,463 @@ def read_collection_data_from_sprlist(sprlist1):
     collection["stable"] = colllist[14]
     return collection
 
-parser = argparse.ArgumentParser(
-    description = """This program will take a tab delimited version of an excel table
-    and convert it to xml importable into WordCorr""")
-parser.add_argument(
-    "input", type=argparse.FileType("r"), nargs="?",
-    default=sys.stdin,
-    help="""The tab-separated spread sheet to read data from, must be in a very
-    specific format.""")
-parser.add_argument(
-    "output", type=argparse.FileType("w"), nargs="?",
-    default=sys.stdout,
-    help="Path of the xml file to be written")
-args = parser.parse_args()
-
-inp = args.input
-
-#CREATE LIST FROM DATA, SPLIT BY 'TAB'
-sprlist1 = []
-for i, line in enumerate(inp):	#read each line in the input and do the following:  
-    if i < 5:
-        # File header with instructions
-        continue
-    
-    list = line.strip("\n").split('\t')    #separate nos/glosses, nos or letters and header info
-    sprlist1.append(list)
-
-    
-#USER INFORMATION:
-userdata = read_user_data_from_sprlist(sprlist1)               
-
-#COLLECTION INFORMATION:
-collection = read_collection_data_from_sprlist(sprlist1)
-#vvvvvvvvvvv Varieties Information vvvvvvvvvvvv
-#CREATES LISTS CONTAINING THE INFORMATION FROM THE VARIETIES
-
-#SET UP LISTS FOR VARIETY INFORMATION:
-def read_variety_metadata(row, may_be_empty=True):
-    varietyproperty=[]
-    varietypropertypre=[]
-    for i in range(3, len(sprlist1[row])):
-        if sprlist1[row][i] != '' or may_be_empty:         #don't append empty fields
+def read_varieties_metadata_from_sprlist(sprlist1):
+    #SET UP LISTS FOR VARIETY INFORMATION:
+    def read_variety_metadata(row, min_len=0):
+        varietyproperty=[]
+        varietypropertypre=[]
+        for i in range(3, len(sprlist1[row])):
             varietypropertypre.append(sprlist1[row][i])
-            
-    for i in range(0, len(varietypropertypre)):   #for this preliminary varietyethn.
-        stripstring = varietypropertypre[i]       #convert to string
-        list = stripstring.strip()                 #strip off trailing empty spaces (prevent linebreaks in xml document
-        list = list.strip('"')               #strip off quotation marks
-        varietyproperty.append(list)              #append to varietyethn.
-    return varietyproperty
 
-varietyproperties = {
-    "ethnologue": read_variety_metadata(25),
-    "name": read_variety_metadata(26, may_be_empty=False),
-    "shortname": read_variety_metadata(27),
-    "abbr": read_variety_metadata(28),
-    "genclass": read_variety_metadata(29),
-    "quality": read_variety_metadata(30),
-    "altname": read_variety_metadata(31),
-    "locale": read_variety_metadata(32),
-    "collcoun": read_variety_metadata(33),
-    "remarks1": read_variety_metadata(34),
-    "remarks2": read_variety_metadata(35),
-    "remarks3": read_variety_metadata(36),
-    "unpub": read_variety_metadata(37),
-    "source1": read_variety_metadata(38),
-    "source2": read_variety_metadata(39),
-    "remarks": read_variety_metadata(40)}
-#vvvvvvvvvv Varieties Information End vvvvvvvvvv
+        while varietypropertypre and not varietypropertypre[-1]:
+            varietypropertypre = varietypropertypre[:-1]
+        varietypropertypre = varietypropertypre + [''] * max(
+            min_len - len(varietypropertypre), 0)
+
+        for stripstring in varietypropertypre:   #for this preliminary varietyethn.
+            list = stripstring.strip()                 #strip off trailing empty spaces (prevent linebreaks in xml document
+            list = list.strip('"')               #strip off quotation marks
+            varietyproperty.append(list)              #append to varietyethn.
+        return varietyproperty
+
+    varnames = read_variety_metadata(26)
+    varietyproperties = {
+        "ethnologue": read_variety_metadata(25, len(varnames)),
+        "name": varnames,
+        "shortname": read_variety_metadata(27, len(varnames)),
+        "abbr": read_variety_metadata(28, len(varnames)),
+        "genclass": read_variety_metadata(29, len(varnames)),
+        "quality": read_variety_metadata(30, len(varnames)),
+        "altname": read_variety_metadata(31, len(varnames)),
+        "locale": read_variety_metadata(32, len(varnames)),
+        "collection_country": read_variety_metadata(33, len(varnames)),
+        "remarks1": read_variety_metadata(34, len(varnames)),
+        "remarks2": read_variety_metadata(35, len(varnames)),
+        "remarks3": read_variety_metadata(36, len(varnames)),
+        "unpub": read_variety_metadata(37, len(varnames)),
+        "source1": read_variety_metadata(38, len(varnames)),
+        "source2": read_variety_metadata(39, len(varnames)),
+        "remarks": read_variety_metadata(40, len(varnames))}
+    #vvvvvvvvvv Varieties Information End vvvvvvvvvv
+    return varietyproperties
+
+def write_xml(outp):
+    #XMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXM
+
+    #PRODUCE XML FILE:
 
 
-#XMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXMLXM
+    #header information:
+    encoding = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    #print encoding
+    outp.write(encoding)
 
-#PRODUCE XML FILE:
-#print "\nXML FILE:"
+    release = '<WordCorr release="Release 2.0" version="2.1">\n'  
+    #print release
+    outp.write(release)
 
-outp = args.output
+    #user info
+    userid = '<user user-id="%(id)s" family-name="%(famname)s" given-name="%(name)s" email="%(email)s">\n' % userdata
+    #print userid
+    outp.write(userid)
 
-#header information:
-encoding = '<?xml version="1.0" encoding="UTF-8"?>\n'
-#print encoding
-outp.write(encoding)
+    #affiliation
+    affiliation = '<affiliations>%s</affiliations>\n'    % (userdata["affiliations"])
+    #print affiliation
+    outp.write(affiliation)
 
-release = '<WordCorr release="Release 2.0" version="2.1">\n'  
-#print release
-outp.write(release)
+    #collection name and shortname:
+    collname = '    <collection name="%(collname)s" short-name="%(collsname)s"' % collection
+    #print collname
+    outp.write(collname)
 
-#user info
-userid = '<user user-id="%(id)s" family-name="%(famname)s" given-name="%(name)s" email="%(email)s">\n' % userdata
-#print userid
-outp.write(userid)
+    #primary and secondary gloss languages and other info:
+    glosslang = ' gloss-language="%(glosslg)s" gloss-language-code="%(lgcode1)s" secondary-gloss-language="%(glosslg2)s" secondary-gloss-language-code="%(lgcode2)s" creator-role="%(creatorrole)s" creator="" publisher="" rights-management="%(rights)s" rights-management-year-copyright-asserted="%(copyright)s" export-timestamp="">\n' % collection
+    #print glosslang
+    outp.write(glosslang)
 
-#affiliation
-affiliation = '<affiliations>%s</affiliations>\n'    % (userdata["affiliations"])
-#print affiliation
-outp.write(affiliation)
+    #contributor
+    contributor = ' <contributor>%s</contributor>\n'  %collection["contributor"]
+    #print contributor
+    outp.write(contributor)
 
-#collection name and shortname:
-collname = '    <collection name="%(collname)s" short-name="%(collsname)s"' % collection
-#print collname
-outp.write(collname)
+    #description
+    description = '<description>%s</description>\n'   %collection["description"]
+    #print description
+    outp.write(description)
 
-#primary and secondary gloss languages and other info:
-glosslang = ' gloss-language="%(glosslg)s" gloss-language-code="%(lgcode1)s" secondary-gloss-language="%(glosslg2)s" secondary-gloss-language-code="%(lgcode2)s" creator-role="%(creatorrole)s" creator="" publisher="" rights-management="%(rights)s" rights-management-year-copyright-asserted="%(copyright)s" export-timestamp="">\n' % collection
-#print glosslang
-outp.write(glosslang)
+    #collection remarks:
+    collrem = '        <remarks>%s</remarks>\n' % collection["remarks"]
+    #print collrem
+    outp.write(collrem)
 
-#contributor
-contributor = ' <contributor>%s</contributor>\n'  %collection["contributor"]
-#print contributor
-outp.write(contributor)
+    #keywords
+    keywords = ' <keywords>%s</keywords>\n'   % collection["keywords"]
+    #print keywords
+    outp.write(keywords)
 
-#description
-description = '<description>%s</description>\n'   %collection["description"]
-#print description
-outp.write(description)
+    #coverage
+    coverage = ' <coverage>%s</coverage>\n'   % collection["coverage"]
+    #print coverage
+    outp.write(coverage)
 
-#collection remarks:
-collrem = '        <remarks>%s</remarks>\n' % collection["remarks"]
-#print collrem
-outp.write(collrem)
-
-#keywords
-keywords = ' <keywords>%s</keywords>\n'   % collection["keywords"]
-#print keywords
-outp.write(keywords)
-
-#coverage
-coverage = ' <coverage>%s</coverage>\n'   % collection["coverage"]
-#print coverage
-outp.write(coverage)
-
-#published-source
-#This creates the input for the 'published source' field.
-#To avoid empty spaces or lines, the script takes into account which of the two lines
-#in the spreadsheet are filled.
-if collection["published"]:
-    publishedsource = ' <published-source>%s</published-source>\n'    % ", ".join(collection["published"])
-else:
-    publishedsource = ' <published-source />\n'    
-outp.write(publishedsource)    
-
-#stable-copy-location
-stablecopylocation = ' <stable-copy-location>%s</stable-copy-location>\n'  % collection["stable"]
-#print stablecopylocation
-outp.write(stablecopylocation)
-
-#varieties opener:
-var = '        <varieties>\n'
-#print var
-outp.write(var)
-
-#LOOP HERE FOR VARIETIES
-n=0
-for i in range(0, len(varietyproperties["name"])):    #for however many varieties are there
-
-#var(x) name, shortname, abbreviation:
-    vxinf = '            <variety name="%(varname)s" short-name="%(varshortn)s" abbreviation="%(varabb)s" ethnologue-code="%(varethn)s">\n' %\
-                {"varname":varietyproperties["name"][i], "varshortn": varietyproperties["shortname"][i], 'varabb': varietyproperties["abbr"][i], 'varethn': varietyproperties["ethnologue"][i]}
-#    print vxinf
-    outp.write(vxinf)
-
-#var(x) alternate-name-list:
-    if varietyproperties["altname"][i] != '\n':
-        vanl = '                <alternate-name-list>%s</alternate-name-list>\n'  %(varietyproperties["altname"][i])
-#        print vanl
-        outp.write(vanl)
-
-#var(x) classification:
-    if varietyproperties["genclass"][i] != '\n':
-        vclass = '                <classification>%s</classification>\n'  %(varietyproperties["genclass"][i])
-#       print vclass
-        outp.write(vclass)
-
-#var(x) locale:
-    if varietyproperties["locale"][i] != '\n':
-        vloc = '                <locale>%s</locale>\n' % varietyproperties["locale"][i]
-#       print vloc
-        outp.write(vloc)
-
-#var(x) quality:str
-    if varietyproperties["quality"][i] != '\n':
-        vqual = '                <quality>%s</quality>\n' % varietyproperties["quality"][i]
-#       print vqual
-        outp.write(vqual)
-
-#var(x) source:
-#To avoid empty spaces or lines, the script takes into account which of the two lines
-#available in the spreadsheet are filled.
-    if varietyproperties["source1"][i] != '' and varietyproperties["source2"][i] != '':
-        vsour = '                <source>%(varsour)s</source>\n' %\
-                {'varsour': varietyproperties["source1"][i]+', '+varietyproperties["source2"][i]}
-#        print vsour
-        outp.write(vsour)
-    elif varietyproperties["source1"][i] == '':
-        vsour = '                <source>%(varsour)s</source>\n' %\
-                {'varsour':varietyproperties["source2"][i]}
-#        print vsour
-        outp.write(vsour)
-    elif varietyproperties["source2"][i] == '':
-        vsour = '                <source>%(varsour)s</source>\n' %\
-                {'varsour':varietyproperties["source1"][i]}
-#        print vsour
-        outp.write(vsour)
+    #published-source
+    #This creates the input for the 'published source' field.
+    #To avoid empty spaces or lines, the script takes into account which of the two lines
+    #in the spreadsheet are filled.
+    if collection["published"]:
+        publishedsource = ' <published-source>%s</published-source>\n'    % ", ".join(collection["published"])
     else:
-        vsour = '                <source />\n'
-#        print vsour
-        outp.write(vsour)
+        publishedsource = ' <published-source />\n'    
+    outp.write(publishedsource)    
 
-#var(x) unpublished source:
-    vunpubsource = '                <unpublished-source>%s</unpublished-source>\n'    %(varietyproperties["unpub"][i])
-#    print vunpubsource
-    outp.write(vunpubsource)
+    #stable-copy-location
+    stablecopylocation = ' <stable-copy-location>%s</stable-copy-location>\n'  % collection["stable"]
+    #print stablecopylocation
+    outp.write(stablecopylocation)
 
-#var(x) country where collected:
-    vccoll = '                <country-where-collected>%s</country-where-collected>\n'  %(varietyproperties["collcoun"][i])
-#    print vccoll
-    outp.write(vccoll)
+    #varieties opener:
+    var = '        <varieties>\n'
+    #print var
+    outp.write(var)
 
-#var(x) remarks:
-#This is a combination of three fields out of the spreadsheet.
-#The following script checks whether the fields in question are filled,
-#and if they are empty, they are not included in Variety remarks,
-#in order to avoid empty spaces and lines.
-    remarks = []
-    if varietyproperties["remarks"][i]:
-        remarks.append(varietyproperties["remarks"][i])
-    if varietyproperties["remarks1"][i]:
-        remarks.append('Place where collected: '+varietyproperties["remarks1"][i])
-    if varietyproperties["remarks2"][i]:
-        remarks.append('Collected by: '+varietyproperties["remarks2"][i])
-    if varietyproperties["remarks3"][i]:
-        remarks.append('Date collected: '+varietyproperties["remarks3"][i])
-    if remarks:
-        vrem = '                <remarks>%s</remarks>\n'  %(
-            ", ".join(remarks))
-    else:
-        vrem = '                <remarks />\n'
-    outp.write(vrem)
-#var(x) close
-    vxclos = '            </variety>\n'
-#    print vxclos
-    outp.write(vxclos)
+    #LOOP HERE FOR VARIETIES
+    for i in range(0, len(varietyproperties["name"])):    #for however many varieties are there
 
-#varieties close:
-varclos = '        </varieties>\n'
-#print varclos
-outp.write(varclos)
+    #var(x) name, shortname, abbreviation:
+        vxinf = '            <variety name="%(varname)s" short-name="%(varshortn)s" abbreviation="%(varabb)s" ethnologue-code="%(varethn)s">\n' %\
+                    {"varname":varietyproperties["name"][i], "varshortn": varietyproperties["shortname"][i], 'varabb': varietyproperties["abbr"][i], 'varethn': varietyproperties["ethnologue"][i]}
+    #    print vxinf
+        outp.write(vxinf)
 
-#LOOP HERE FOR DATA AND GLOSS, generator for entry number:
-#data open:
-data = '        <data>\n'
-#print data
-outp.write(data)
+    #var(x) alternate-name-list:
+        if varietyproperties["altname"][i] != '\n':
+            vanl = '                <alternate-name-list>%s</alternate-name-list>\n'  %(varietyproperties["altname"][i])
+    #        print vanl
+            outp.write(vanl)
 
-#Data starting line 65:
-#entry# | gloss1 | gloss2 | var1 | var2 | etc.
+    #var(x) classification:
+        if varietyproperties["genclass"][i] != '\n':
+            vclass = '                <classification>%s</classification>\n'  %(varietyproperties["genclass"][i])
+    #       print vclass
+            outp.write(vclass)
 
-#complete data, all info:
-entrylist=[]
-for i in range(43, len(sprlist1)):
-    entrylist.append(sprlist1[i])
-#print entrylist
+    #var(x) locale:
+        if varietyproperties["locale"][i] != '\n':
+            vloc = '                <locale>%s</locale>\n' % varietyproperties["locale"][i]
+    #       print vloc
+            outp.write(vloc)
 
-#entrynumbers:
-entrynumbers=[]
-for i in range(43, len(sprlist1)):
-    if sprlist1[i][0] != '':
-        entrynumbers.append(sprlist1[i][0])
-#print entrynumbers
+    #var(x) quality:str
+        if varietyproperties["quality"][i] != '\n':
+            vqual = '                <quality>%s</quality>\n' % varietyproperties["quality"][i]
+    #       print vqual
+            outp.write(vqual)
 
-#for i in range(43, len(sprlist1)):
-#    print sprlist1[i]
-#print '*******************'
+    #var(x) source:
+    #To avoid empty spaces or lines, the script takes into account which of the two lines
+    #available in the spreadsheet are filled.
+        if varietyproperties["source1"][i] != '' and varietyproperties["source2"][i] != '':
+            vsour = '                <source>%(varsour)s</source>\n' %\
+                    {'varsour': varietyproperties["source1"][i]+', '+varietyproperties["source2"][i]}
+    #        print vsour
+            outp.write(vsour)
+        elif varietyproperties["source1"][i] == '':
+            vsour = '                <source>%(varsour)s</source>\n' %\
+                    {'varsour':varietyproperties["source2"][i]}
+    #        print vsour
+            outp.write(vsour)
+        elif varietyproperties["source2"][i] == '':
+            vsour = '                <source>%(varsour)s</source>\n' %\
+                    {'varsour':varietyproperties["source1"][i]}
+    #        print vsour
+            outp.write(vsour)
+        else:
+            vsour = '                <source />\n'
+    #        print vsour
+            outp.write(vsour)
 
-#gloss1:
-gloss1=[]
-for i in range(43, len(sprlist1)):
-    list = sprlist1[i][1].strip('"').strip()
-    gloss1.append(list)
-#print gloss1
+    #var(x) unpublished source:
+        vunpubsource = '                <unpublished-source>%s</unpublished-source>\n'    %(varietyproperties["unpub"][i])
+    #    print vunpubsource
+        outp.write(vunpubsource)
 
-#gloss2:
-gloss2=[]
-for i in range(43, len(sprlist1)):
-    list = sprlist1[i][2].strip('"').strip()
-    gloss2.append(list)
-#print gloss2
+    #var(x) country where collected:
+        vccoll = '                <country-where-collected>%s</country-where-collected>\n'  %(varietyproperties["collection_country"][i])
+    #    print vccoll
+        outp.write(vccoll)
 
-#data:
-#sprlist1: #, gl1, gl2, var1dat, var2dat, var3dat, var4dat, etc.
-datapre=[]
-for i in range(43, len(sprlist1)):          #excluding metadata
-    for j in range(3, len(varietyproperties["name"])+3):  #data only, '+3' to get all data (first three items are #, gl1, gl2, then all variety data, '+3' to make up for first three skipped
-        datapre.append(sprlist1[i][j])
+    #var(x) remarks:
+    #This is a combination of three fields out of the spreadsheet.
+    #The following script checks whether the fields in question are filled,
+    #and if they are empty, they are not included in Variety remarks,
+    #in order to avoid empty spaces and lines.
+        remarks = []
+        if varietyproperties["remarks"][i]:
+            remarks.append(varietyproperties["remarks"][i])
+        if varietyproperties["remarks1"][i]:
+            remarks.append('Place where collected: '+varietyproperties["remarks1"][i])
+        if varietyproperties["remarks2"][i]:
+            remarks.append('Collected by: '+varietyproperties["remarks2"][i])
+        if varietyproperties["remarks3"][i]:
+            remarks.append('Date collected: '+varietyproperties["remarks3"][i])
+        if remarks:
+            vrem = '                <remarks>%s</remarks>\n'  %(
+                ", ".join(remarks))
+        else:
+            vrem = '                <remarks />\n'
+        outp.write(vrem)
+    #var(x) close
+        vxclos = '            </variety>\n'
+    #    print vxclos
+        outp.write(vxclos)
 
-#this a list containing all datums in the following order:
-#var1 dat1, var2 dat1, etc., var1 dat2, var2 dat2, etc.
+    #varieties close:
+    varclos = '        </varieties>\n'
+    #print varclos
+    outp.write(varclos)
 
-datastrip=[]
-for i in range(0, len(datapre)):
-    strip = datapre[i]      #convert to string
-    list = strip.strip()   #strip off trailing empty spaces (prevent linebreaks in xml document)
-    list = list.strip('"')
-    list = list.strip('\n')
-    datastrip.append(list)  #append to data
-#for i in range(0, 50):
-#    print [i]
-#    print datastrip[i]
+    #LOOP HERE FOR DATA AND GLOSS, generator for entry number:
+    #data open:
+    data = '        <data>\n'
+    #print data
+    outp.write(data)
 
-#split multiple data per entry/variety:
-#The Text (*.txt) file format saves only the text and values as they are displayed
-#in cells of the active worksheet. All rows and all characters in each cell are saved.
-#Columns of data are separated by tab characters, and each row of data ends in a
-#carriage return. If a cell contains a comma, the cell contents are enclosed in double quotation marks
-#which is stripped off in the script above. 
-splitstring = ''
-datasplit = []
-list = ''
-for i in range(0, len(datastrip)):
-    splitstring = datastrip[i]          #this makes the list splitable
-    list = splitstring.split(',')      #separate multiple data
-    datasplit.append(list)     
+    #Data starting line 65:
+    #entry# | gloss1 | gloss2 | var1 | var2 | etc.
 
-#mult. datums are split, but still belong together per variety
+    #complete data, all info:
+    entrylist=[]
+    for i in range(43, len(sprlist1)):
+        entrylist.append(sprlist1[i])
+    #print entrylist
 
-#count number of varieties in data
-varieties=[]
-for i in range(26, 27):
-    del sprlist1[i][0]
-for i in range(2, len(sprlist1[26])):
-    if sprlist1[26][i] != '\n' and sprlist1[26][i] != '':
-        varieties.append(sprlist1[26][i])
-#print varieties
-#print '######################'
+    #entrynumbers:
+    entrynumbers=[]
+    for i in range(43, len(sprlist1)):
+        if sprlist1[i][0] != '':
+            entrynumbers.append(sprlist1[i][0])
+    #print entrynumbers
 
-#entry number, gloss1, gloss2
-m=0
-for i in range(0, len(entrynumbers)):              #full length: entrynumbers
-    if entrynumbers[i] != '' and entrynumbers[i] != '\n':
-            entrynumgl = '            <entry entry-number="%(no)s" gloss="%(gloss1)s" secondary-gloss="%(gloss2)s">\n' %\
-                                {'no' : entrynumbers[i], 'gloss1' : gloss1[i], 'gloss2':gloss2[i]}
-#        print entrynumgl
-            outp.write(entrynumgl)
+    #for i in range(43, len(sprlist1)):
+    #    print sprlist1[i]
+    #print '*******************'
 
-#*********VARx DATA open***************       
-#datum number (generated here, only works if the collection has less than 10,000 datums )
-#variety short-name
-#datum: cycles through varieties and multiple datums
-#DATUM NUMBERS CREATED HERE ARE NOT UNIQUE.
-#NON-UNIQUE DATUM NUMBERS ARE NOT A PROBLEM, SINCE EACH DATUM IS ASSIGNED A NEW NUMBER UPON IMPORT INTO WORDCORR
-#DATUM NUMBERS ASSIGNED HERE WILL NOT PERSIST
-#IF THIS COLLECTION IS EXPORTED FROM WORDCORR, THE DATUM NUMBERS WILL BE DIFFERENT FROM THE NUMBERS ASSIGNED HERE
-    for l in range(0, len(varieties)):
-        for k in range(0, len(datasplit[i+l+m])):
-            if datasplit[i+l+m][k] != '' and datasplit[i+l+m][k] != '\n':
-                datum = '                <datum datum-number="%(no)s" short-name="%(varshortn)s" datum="%(datm)s">\n' %\
-                    {'no' : i+k+m+l, 'varshortn' : varietyproperties["shortname"][l], 'datm' : (datasplit[i+l+m][k]).strip()}    
-#                print datum
-                outp.write(datum)   #.encode('utf-8'))   #encode as unicode
+    #gloss1:
+    gloss1=[]
+    for i in range(43, len(sprlist1)):
+        list = sprlist1[i][1].strip('"').strip()
+        gloss1.append(list)
+    #print gloss1
 
-#special semantics of datum
-                specsem = '                    <special-semantics />\n'
-#                print specsem
-                outp.write(specsem)
-       
-#remarks for datum
-                datrem = '                    <remarks />\n'
-#                print datrem
-                outp.write(datrem)
-    
-#close datum
-                datcls = '                </datum>\n'
-#               print datcls
-                outp.write(datcls)
-    m=m+(len(varieties)-1)   #m=m+(len(varieties)-1)   
-#*********VARx DATA closed***************
+    #gloss2:
+    gloss2=[]
+    for i in range(43, len(sprlist1)):
+        list = sprlist1[i][2].strip('"').strip()
+        gloss2.append(list)
+    #print gloss2
 
-#close entry
-    entrcls = '            </entry>\n'
-#    print entrcls
-    outp.write(entrcls)
+    #data:
+    #sprlist1: #, gl1, gl2, var1dat, var2dat, var3dat, var4dat, etc.
+    datapre=[]
+    for i in range(43, len(sprlist1)):          #excluding metadata
+        for j in range(3, len(varietyproperties["name"])+3):  #data only, '+3' to get all data (first three items are #, gl1, gl2, then all variety data, '+3' to make up for first three skipped
+            datapre.append(sprlist1[i][j])
 
-#close data
-datacls = '        </data>\n'
-#print datacls
-outp.write(datacls)
+    #this a list containing all datums in the following order:
+    #var1 dat1, var2 dat1, etc., var1 dat2, var2 dat2, etc.
 
-#open view information
-viewsop = '        <views>\n'
-#print viewsop
-outp.write(viewsop)
+    datastrip=[]
+    for i in range(0, len(datapre)):
+        strip = datapre[i]      #convert to string
+        list = strip.strip()   #strip off trailing empty spaces (prevent linebreaks in xml document)
+        list = list.strip('"')
+        list = list.strip('\n')
+        datastrip.append(list)  #append to data
+    #for i in range(0, 50):
+    #    print [i]
+    #    print datastrip[i]
 
-#open view1
-viewop = '            <view view-name="Original" threshold="50">\n'
-#print viewop
-outp.write(viewop)
+    #split multiple data per entry/variety:
+    #The Text (*.txt) file format saves only the text and values as they are displayed
+    #in cells of the active worksheet. All rows and all characters in each cell are saved.
+    #Columns of data are separated by tab characters, and each row of data ends in a
+    #carriage return. If a cell contains a comma, the cell contents are enclosed in double quotation marks
+    #which is stripped off in the script above. 
+    splitstring = ''
+    datasplit = []
+    list = ''
+    for i in range(0, len(datastrip)):
+        splitstring = datastrip[i]          #this makes the list splitable
+        list = splitstring.split(',')      #separate multiple data
+        datasplit.append(list)     
 
-#remarks view1
-remarks = '                <remarks />\n'
-#print remarks
-outp.write(remarks)
+    #mult. datums are split, but still belong together per variety
 
-#view info: short name, order number (generated here)
-#viewmember(x):
-for i in range(0, len(varietyproperties["name"])):    #for all varieties
-    viewmem = '                <view-member short-name="%(varshortn)s" order-number="%(no)s" />\n' %\
-            {'varshortn': varietyproperties["shortname"][i], 'no':i+1}
-#    print viewmem
-    outp.write(viewmem)
+    #count number of varieties in data
+    varieties=[]
+    for i in range(26, 27):
+        del sprlist1[i][0]
+    for i in range(2, len(sprlist1[26])):
+        if sprlist1[26][i] != '\n' and sprlist1[26][i] != '':
+            varieties.append(sprlist1[26][i])
+    #print varieties
+    #print '######################'
 
-#annotations:
-annop = '                <annotations />\n'
-#print annop
-outp.write(annop)
+    #entry number, gloss1, gloss2
+    m=0
+    for i in range(0, len(entrynumbers)):              #full length: entrynumbers
+        if entrynumbers[i] != '' and entrynumbers[i] != '\n':
+                entrynumgl = '            <entry entry-number="%(no)s" gloss="%(gloss1)s" secondary-gloss="%(gloss2)s">\n' %\
+                                    {'no' : entrynumbers[i], 'gloss1' : gloss1[i], 'gloss2':gloss2[i]}
+    #        print entrynumgl
+                outp.write(entrynumgl)
 
-#results (Refine)
-results = '                  <results />\n'
-#print results
-outp.write(results)
+    #*********VARx DATA open***************       
+    #datum number (generated here, only works if the collection has less than 10,000 datums )
+    #variety short-name
+    #datum: cycles through varieties and multiple datums
+    #DATUM NUMBERS CREATED HERE ARE NOT UNIQUE.
+    #NON-UNIQUE DATUM NUMBERS ARE NOT A PROBLEM, SINCE EACH DATUM IS ASSIGNED A NEW NUMBER UPON IMPORT INTO WORDCORR
+    #DATUM NUMBERS ASSIGNED HERE WILL NOT PERSIST
+    #IF THIS COLLECTION IS EXPORTED FROM WORDCORR, THE DATUM NUMBERS WILL BE DIFFERENT FROM THE NUMBERS ASSIGNED HERE
+        for l in range(0, len(varieties)):
+            for k in range(0, len(datasplit[i+l+m])):
+                if datasplit[i+l+m][k] != '' and datasplit[i+l+m][k] != '\n':
+                    datum = '                <datum datum-number="%(no)s" short-name="%(varshortn)s" datum="%(datm)s">\n' %\
+                        {'no' : i+k+m+l, 'varshortn' : varietyproperties["shortname"][l], 'datm' : (datasplit[i+l+m][k]).strip()}    
+    #                print datum
+                    outp.write(datum)   #.encode('utf-8'))   #encode as unicode
 
-#tabulated groups
-tabgroups = '                <tabulated-groups />\n'
-#print tabgroups
-outp.write(tabgroups)
+    #special semantics of datum
+                    specsem = '                    <special-semantics />\n'
+    #                print specsem
+                    outp.write(specsem)
 
-#close view
-viewcls = '            </view>\n'
-#print viewcls
-outp.write(viewcls)
+    #remarks for datum
+                    datrem = '                    <remarks />\n'
+    #                print datrem
+                    outp.write(datrem)
 
-#close views
-viewscls = '        </views>\n'
-#print viewscls
-outp.write(viewscls)
+    #close datum
+                    datcls = '                </datum>\n'
+    #               print datcls
+                    outp.write(datcls)
+        m=m+(len(varieties)-1)   #m=m+(len(varieties)-1)   
+    #*********VARx DATA closed***************
 
-#collection closer
-v = '    </collection>\n'
-#print v
-outp.write(v)
+    #close entry
+        entrcls = '            </entry>\n'
+    #    print entrcls
+        outp.write(entrcls)
 
-#user closer
-useclos = '</user>\n'
-#print useclos
-outp.write(useclos)
+    #close data
+    datacls = '        </data>\n'
+    #print datacls
+    outp.write(datacls)
 
-#WordCorr closer
-z = '</WordCorr>'
-#print z
-outp.write(z)
+    #open view information
+    viewsop = '        <views>\n'
+    #print viewsop
+    outp.write(viewsop)
 
-#close "output"
-outp.close()
+    #open view1
+    viewop = '            <view view-name="Original" threshold="50">\n'
+    #print viewop
+    outp.write(viewop)
+
+    #remarks view1
+    remarks = '                <remarks />\n'
+    #print remarks
+    outp.write(remarks)
+
+    #view info: short name, order number (generated here)
+    #viewmember(x):
+    for i in range(0, len(varietyproperties["name"])):    #for all varieties
+        viewmem = '                <view-member short-name="%(varshortn)s" order-number="%(no)s" />\n' %\
+                {'varshortn': varietyproperties["shortname"][i], 'no':i+1}
+    #    print viewmem
+        outp.write(viewmem)
+
+    #annotations:
+    annop = '                <annotations />\n'
+    #print annop
+    outp.write(annop)
+
+    #results (Refine)
+    results = '                  <results />\n'
+    #print results
+    outp.write(results)
+
+    #tabulated groups
+    tabgroups = '                <tabulated-groups />\n'
+    #print tabgroups
+    outp.write(tabgroups)
+
+    #close view
+    viewcls = '            </view>\n'
+    #print viewcls
+    outp.write(viewcls)
+
+    #close views
+    viewscls = '        </views>\n'
+    #print viewscls
+    outp.write(viewscls)
+
+    #collection closer
+    v = '    </collection>\n'
+    #print v
+    outp.write(v)
+
+    #user closer
+    useclos = '</user>\n'
+    #print useclos
+    outp.write(useclos)
+
+    #WordCorr closer
+    z = '</WordCorr>'
+    #print z
+    outp.write(z)
+
+    #close "output"
+    outp.close()
+
+if __name__=='__main__':
+    parser = argparse.ArgumentParser(
+        description = """This program will take a tab delimited version of an excel table
+        and convert it to xml importable into WordCorr""")
+    parser.add_argument(
+        "input", type=argparse.FileType("r"), nargs="?",
+        default=sys.stdin,
+        help="""The tab-separated spread sheet to read data from, must be in a very
+        specific format.""")
+    parser.add_argument(
+        "output", type=argparse.FileType("w"), nargs="?",
+        default=sys.stdout,
+        help="Path of the xml file to be written")
+    args = parser.parse_args()
+
+    inp = args.input
+
+    #CREATE LIST FROM DATA, SPLIT BY 'TAB'
+    sprlist1 = []
+    for i, line in enumerate(inp):	#read each line in the input and do the following:  
+        if i < 5:
+            # File header with instructions
+            continue
+
+        list = line.strip("\n").split('\t')    #separate nos/glosses, nos or letters and header info
+        sprlist1.append(list)
+
+
+    #USER INFORMATION:
+    userdata = read_user_data_from_sprlist(sprlist1)               
+
+    #COLLECTION INFORMATION:
+    collection = read_collection_data_from_sprlist(sprlist1)
+
+    #CREATES DICT OF LISTS CONTAINING THE INFORMATION FROM THE VARIETIES
+    varietyproperties = read_varieties_metadata_from_sprlist(sprlist1)
+
+    write_xml(args.output)
+
