@@ -69,11 +69,11 @@
 ######################################################################
 
 #double check:
-print "\nPlease make sure that:\n\
+print("\nPlease make sure that:\n\
 1. your input file is is a simple text file with encoding 'utf-8'\n\
 2. your input file is in the same directory as the Spreadsheet Conversion script\n\
 3. the folder containing your input file and the Spreadsheet Conversion script is located in your Python folder\n\
-\n"
+\n")
 
 #*********************************************
 import string
@@ -81,11 +81,11 @@ import string
 #IMPORT DATA AND CREATE LIST WITH ENTRIES (TAKING OFF TRAILING SPACES)
 while 1:
     try:
-        input = raw_input("Please type complete name of your input file, including extension (e.g. Austronesian.txt): ")
+        input = input("Please type complete name of your input file, including extension (e.g. Austronesian.txt): ")
         inp = open(input,"r")   #takes raw input from above and uses it as input for the conversion
         break
     except IOError: #If there is a spelling error, or if the file is not in the correct directory
-        print "\nThis file cannot be found. Please try again.\n"
+        print("\nThis file cannot be found. Please try again.\n")
     
 #CREATE LIST FROM DATA, SPLIT BY 'TAB'
 sprlist = []
@@ -358,7 +358,7 @@ for i in range(0, len(varietyremarkspre)):      #for this preliminary varietyrem
 
 #PRODUCE XML FILE:
 #print "\nXML FILE:"
-output = raw_input("Enter name for xml file (e.g. AustronesianCollection) ")
+output = input("Enter name for xml file (e.g. AustronesianCollection) ")
 
 outp = open(output,"w")
 
@@ -845,10 +845,10 @@ outp.write(z)
 #close "output"
 outp.close()
 
-print "\n***Conversion completed.***\n"
+print("\n***Conversion completed.***\n")
 
-print "To import your collection into WordCorr:\n\
+print("To import your collection into WordCorr:\n\
 1. Open WordCorr\n\
 2. Go to File, Import XML.\n\
 3. Find your collection in the Open window.\n\
-4. Double click on your file.\n"
+4. Double click on your file.\n")
