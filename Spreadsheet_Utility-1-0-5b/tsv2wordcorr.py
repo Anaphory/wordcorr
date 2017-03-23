@@ -134,10 +134,10 @@ for i in range(0, len(colllistprelim)): #for this preliminary datalist
     list = stripstring.strip()         #strip off trailing empty spaces (prevent linebreaks in xml document
     list = list.strip('"')
     colllist.append(list)               #append to datalist
-#print "COLLECTION INFO"
-#for i in range(0,len(colllist)):
-#    print colllist[i]
-
+collection = {"collname":colllist[0],"collsname":colllist[1],
+              "glosslg":colllist[4], "lgcode1":colllist[5], "glosslg2":colllist[6],
+              "lgcode2":colllist[7], "creatorrole":colllist[2],
+              "rights":colllist[15], "copyright":colllist[16]}
 #vvvvvvvvvvv Varieties Information vvvvvvvvvvvv
 #CREATES LISTS CONTAINING THE INFORMATION FROM THE VARIETIES
 
@@ -203,14 +203,12 @@ affiliation = '<affiliations>%s</affiliations>\n'    % (userdata["affiliations"]
 outp.write(affiliation)
 
 #collection name and shortname:
-collname = '    <collection name="%(collname)s" short-name="%(collsname)s"' %\
-           {"collname":colllist[0],"collsname":colllist[1]}
+collname = '    <collection name="%(collname)s" short-name="%(collsname)s"' % collection
 #print collname
 outp.write(collname)
 
 #primary and secondary gloss languages and other info:
-glosslang = ' gloss-language="%(glosslg)s" gloss-language-code="%(lgcode1)s" secondary-gloss-language="%(glosslg2)s" secondary-gloss-language-code="%(lgcode2)s" creator-role="%(creatorrole)s" creator="" publisher="" rights-management="%(rights)s" rights-management-year-copyright-asserted="%(copyright)s" export-timestamp="">\n' %\
-            {"glosslg":colllist[4], "lgcode1":colllist[5], "glosslg2":colllist[6], "lgcode2":colllist[7], "creatorrole":colllist[2], "rights":colllist[15], "copyright":colllist[16]}
+glosslang = ' gloss-language="%(glosslg)s" gloss-language-code="%(lgcode1)s" secondary-gloss-language="%(glosslg2)s" secondary-gloss-language-code="%(lgcode2)s" creator-role="%(creatorrole)s" creator="" publisher="" rights-management="%(rights)s" rights-management-year-copyright-asserted="%(copyright)s" export-timestamp="">\n' % collection
 #print glosslang
 outp.write(glosslang)
 
