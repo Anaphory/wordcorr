@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WordCorr release="Release 2.0" version="2.1">
+<user user-id="" family-name="" given-name="" email="">
+<affiliations></affiliations>
+    <collection name="South Sulawesi" short-name="SulSel12" gloss-language="English" gloss-language-code="ENG" secondary-gloss-language="Bahasa Indonesia" secondary-gloss-language-code="INZ" creator-role="annotator, author, compiler, editor, researcher, transcriber" creator="" publisher="" rights-management="Open Publishing, Common Content, GNU Publishing" rights-management-year-copyright-asserted="2003" export-timestamp="">
+ <contributor></contributor>
+<description>Twelve speech varieties of South Sulawesi, Indonesia, from survey trips in 1982 and 1983, imported from WordSurv file constructed by Joseph E. Grimes.</description>
+        <remarks>12 varieties, 202 entries. Short names of varieties and secondary glosses added from monograph.</remarks>
+ <keywords>Austronesian, Sulawesi, Indonesia</keywords>
+ <coverage>Southern Peninsula of Sulawesi and Selayar Island</coverage>
+ <published-source>Grimes, Charles E. and Grimes, Barbara D. 1987. Languages of South Sulawesi (Materials in Languages of Indonesia, No. 38, W. A. L. Stokhof, Series Editor). Pacific Linguistics Series D - No. 78. Pp. i-viii, 1-208.</published-source>
+ <stable-copy-location>Linguistics Department, Research Center for Pacific Studies, The Australian National University, Canberra, ACT 2601, Australia</stable-copy-location>
+        <varieties>
+            <variety name="Makassar of Gowa" short-name="Mak" abbreviation="M" ethnologue-code="MSR">
+                <alternate-name-list></alternate-name-list>
+                <classification>genclassM</classification>
+                <locale>Makassar City and environs</locale>
+                <quality>B</quality>
+                <source>Grimes, Charles E. and Grimes, Barbara D. 1987. Languages of South Sulawesi (Materials in Languages of Indonesia, No. 38, W. A. L. Stokhof, Series Editor). Pacific Linguistics Series D - No. 78. Pp. i-viii, 1-208.</source>
+                <unpublished-source>Tjako (70 years); Umi Daeng Bau' (41 years)</unpublished-source>
+                <country-where-collected>Indonesia</country-where-collected>
+                <remarks>B implosive > ɓ, R trill > r N vB implosive > ɓ, R trill > r N velar > ŋ; J alveopalatal > ʤ, c palatal J>j, D fricative > ð, O open > ɔ, Place where collected: Malino, Gowa, Collected by: Charles Grimes, Date collected: 1984</remarks>
+            </variety>
+            <variety name="Konjo of Pesisir (Coastal)" short-name="Knj" abbreviation="K" ethnologue-code="KJC">
+                <alternate-name-list>Konjo</alternate-name-list>
+                <classification>genclassK</classification>
+                <locale>East coast of southern peninsula</locale>
+                <quality>A</quality>
+                <source>Grimes, Charles E. and Grimes, Barbara D. 1987. Languages of South Sulawesi (Materials in Languages of Indonesia, No. 38, W. A. L. Stokhof, Series Editor). Pacific Linguistics Series D - No. 78. Pp. i-viii, 1-208.</source>
+                <unpublished-source>six men in Tanalemo</unpublished-source>
+                <country-where-collected>Indonesia</country-where-collected>
+                <remarks>Collected by Charles E. Grimes at Tanalemo, Bulukumba, 1984., Collected by: Charles Grimes, Date collected: 1984</remarks>
+            </variety>
+            <variety name="Selayar" short-name="Sel" abbreviation="S" ethnologue-code="SLY">
+                <alternate-name-list></alternate-name-list>
+                <classification>genclassS</classification>
+                <locale>Selayar Island</locale>
+                <quality>A</quality>
+                <source>Grimes, Charles E. and Grimes, Barbara D. 1987. Languages of South Sulawesi (Materials in Languages of Indonesia, No. 38, W. A. L. Stokhof, Series Editor). Pacific Linguistics Series D - No. 78. Pp. i-viii, 1-208.</source>
+                <unpublished-source></unpublished-source>
+                <country-where-collected></country-where-collected>
+                <remarks>Collected by: Charles Grimes, Date collected: 1984</remarks>
+            </variety>
+        </varieties>
+        <data>
+            <entry entry-number="1" gloss="tree" secondary-gloss="pohon">
+                <datum datum-number="0" short-name="Mak" datum="poko?">
+                    <special-semantics />
+                    <remarks />
+                </datum>
+                <datum datum-number="1" short-name="Knj" datum="poko?">
+                    <special-semantics />
+                    <remarks />
+                </datum>
+                <datum datum-number="2" short-name="Sel" datum="po?oN">
+                    <special-semantics />
+                    <remarks />
+                </datum>
+            </entry>
+            <entry entry-number="2" gloss="leaf" secondary-gloss="daun">
+                <datum datum-number="3" short-name="Mak" datum="leko?">
+                    <special-semantics />
+                    <remarks />
+                </datum>
+                <datum datum-number="4" short-name="Mak" datum="lekoh">
+                    <special-semantics />
+                    <remarks />
+                </datum>
+                <datum datum-number="4" short-name="Knj" datum="rauN">
+                    <special-semantics />
+                    <remarks />
+                </datum>
+                <datum datum-number="5" short-name="Sel" datum="taha">
+                    <special-semantics />
+                    <remarks />
+                </datum>
+            </entry>
+            <entry entry-number="3" gloss="root" secondary-gloss="akar">
+                <datum datum-number="6" short-name="Mak" datum="aka?">
+                    <special-semantics />
+                    <remarks />
+                </datum>
+                <datum datum-number="7" short-name="Knj" datum="aka?">
+                    <special-semantics />
+                    <remarks />
+                </datum>
+                <datum datum-number="8" short-name="Sel" datum="aka?">
+                    <special-semantics />
+                    <remarks />
+                </datum>
+            </entry>
+        </data>
+        <views>
+            <view view-name="Original" threshold="50">
+                <remarks />
+                <view-member short-name="Mak" order-number="1" />
+                <view-member short-name="Knj" order-number="2" />
+                <view-member short-name="Sel" order-number="3" />
+                <annotations />
+                  <results />
+                <tabulated-groups />
+            </view>
+        </views>
+    </collection>
+</user>
+</WordCorr>
