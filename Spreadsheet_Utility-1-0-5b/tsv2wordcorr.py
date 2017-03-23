@@ -354,44 +354,20 @@ for i in range(0, len(varietyname)):    #for however many varieties are there
 #The following script checks whether the fields in question are filled,
 #and if they are empty, they are not included in Variety remarks,
 #in order to avoid empty spaces and lines.
+    remarks = []
+    if varietyremarks[i]:
+        remarks.append(varietyremarks[i])
     if varietyremarks1[i]:
-        varietyremarks1x = 'Place where collected: '+varietyremarks1[i]
-
+        remarks.append('Place where collected: '+varietyremarks1[i])
     if varietyremarks2[i]:
-        varietyremarks2x = 'Collected by: '+varietyremarks2[i]
-
+        remarks.append('Collected by: '+varietyremarks2[i])
     if varietyremarks3[i]:
-        varietyremarks3x = 'Date collected: '+varietyremarks3[i]
+        remarks.append('Date collected: '+varietyremarks3[i])
 
-    if varietyremarks[i] and varietyremarks1[i] and varietyremarks2[i] and varietyremarks3[i] :
-        vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks[i]+ ', ' +varietyremarks1x+', '+varietyremarks2x +', '+varietyremarks3x)
-    if not varietyremarks[i] and varietyremarks1[i] and varietyremarks2[i] and varietyremarks3[i] :
-        vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks1x+', '+varietyremarks2x +', '+varietyremarks3x)
-    if varietyremarks[i] =='' and varietyremarks1[i] =='' and varietyremarks2[i]  and varietyremarks3[i] :
-        vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks2x +', '+varietyremarks3x)
-    if varietyremarks[i] =='' and varietyremarks1[i]  and varietyremarks2[i] =='' and varietyremarks3[i] :
-        vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks1x+', '+varietyremarks3x)
-    if varietyremarks[i] =='' and varietyremarks1[i]  and varietyremarks2[i]  and varietyremarks3[i] =='':
-        vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks1x+', '+varietyremarks2x)
-    if varietyremarks[i] =='' and varietyremarks1[i] =='' and varietyremarks2[i] =='' and varietyremarks3[i] :
-        vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks3x)
-    if varietyremarks[i] =='' and varietyremarks1[i] =='' and varietyremarks2[i]  and varietyremarks3[i] =='':
-        vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks2x)
-    if varietyremarks[i] =='' and varietyremarks1[i]  and varietyremarks2[i] =='' and varietyremarks3[i] =='':
-        vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks1x)
-    if varietyremarks[i]  and varietyremarks1[i] =='' and varietyremarks2[i]  and varietyremarks3[i] :
-        vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks[i]+ ', ' +varietyremarks2x +', '+varietyremarks3x)
-    if varietyremarks[i]  and varietyremarks1[i] =='' and varietyremarks2[i] =='' and varietyremarks3[i] :
-        vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks[i]+ ', ' +varietyremarks3x)
-    if varietyremarks[i]  and varietyremarks1[i] =='' and varietyremarks2[i]  and varietyremarks3[i] =='':
-        vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks[i]+ ', ' +varietyremarks2x)
-    if varietyremarks[i]  and varietyremarks1[i] =='' and varietyremarks2[i] =='' and varietyremarks3[i] =='':
-        vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks[i])
-    if varietyremarks[i]  and varietyremarks1[i]  and varietyremarks2[i] =='' and varietyremarks3[i] :
-        vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks[i]+ ', ' +varietyremarks1x+', '+varietyremarks3x)
-    if varietyremarks[i]  and varietyremarks1[i]  and varietyremarks2[i] =='' and varietyremarks3[i] =='':
-        vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks[i]+ ', ' +varietyremarks1x)
-    if varietyremarks[i] =='' and varietyremarks1[i] =='' and varietyremarks2[i] =='' and varietyremarks3[i] =='':
+    if remarks:
+        vrem = '                <remarks>%s</remarks>\n'  %(
+            ",".join(remarks))
+    else:
         vrem = '                <remarks />\n'
 
     outp.write(vrem)
