@@ -72,6 +72,24 @@ and the user and publisher that appears in the exported file.
 import sys
 import argparse
 
+def read_user_data_from_sprlist(sprlist1):
+    userlistprelim = []           #create a list of all data filled in by the user
+    stripstring = ''
+    userlist = []
+    for i in range(0, 5):                   #for all Collection metadata
+        try:                                #try to append the data to preliminary datalist
+            userlistprelim.append(sprlist1[i][3])
+        except IndexError:                  #if a field is empty
+            userlistprelim.append('*')      #append a '*' instead
+    for i in range(0, len(userlistprelim)): #for this preliminary datalist
+        string = userlistprelim[i]     #convert to string
+        list = stripstring.strip()         #strip off trailing empty spaces (prevent linebreaks in xml document
+        list = list.strip('"')
+        userlist.append(list)               #append to datalist
+    return dict(zip(
+        ["id", "famname", "name", "affiliations", "email"],
+        userlist))
+ 
 parser = argparse.ArgumentParser(
     description = """This program will take a tab delimited version of an excel table
     and convert it to xml importable into WordCorr""")
@@ -98,23 +116,9 @@ for i, line in enumerate(inp):	#read each line in the input and do the following
     list = line.strip("\n").split('\t')    #separate nos/glosses, nos or letters and header info
     sprlist1.append(list)
 
+    
 #USER INFORMATION:
-userlistprelim = []           #create a list of all data filled in by the user
-stripstring = ''
-userlist = []
-for i in range(0, 6):                   #for all Collection metadata
-    try:                                #try to append the data to preliminary datalist
-        userlistprelim.append(sprlist1[i][3])
-    except IndexError:                  #if a field is empty
-        userlistprelim.append('*')      #append a '*' instead
-for i in range(0, len(userlistprelim)): #for this preliminary datalist
-    string = userlistprelim[i]     #convert to string
-    list = stripstring.strip()         #strip off trailing empty spaces (prevent linebreaks in xml document
-    list = list.strip('"')
-    userlist.append(list)               #append to datalist
-#print "USER INFO"
-#for i in range(0,len(userlist)):
-#    print userlist[i] 
+userdata = read_user_data_from_sprlist(sprlist1)               
 
 #COLLECTION INFORMATION:
 colllistprelim = []           #create a list of all data filled in by the user
@@ -152,22 +156,23 @@ def read_variety_metadata(row, may_be_empty=True):
         varietyproperty.append(list)              #append to varietyethn.
     return varietyproperty
 
-varietyethnologue = read_variety_metadata(25)
-varietyname = read_variety_metadata(26, may_be_empty=False)
-varietyshortname = read_variety_metadata(27)
-varietyabbr = read_variety_metadata(28)
-varietygenclass = read_variety_metadata(29)
-varietyquality = read_variety_metadata(30)
-varietyaltname = read_variety_metadata(31)
-varietylocale = read_variety_metadata(32)
-varietycollcoun = read_variety_metadata(33)
-varietyremarks1 = read_variety_metadata(34)
-varietyremarks2 = read_variety_metadata(35)
-varietyremarks3 = read_variety_metadata(36)
-varietyunpub = read_variety_metadata(37)
-varietysource1 = read_variety_metadata(38)
-varietysource2 = read_variety_metadata(39)
-varietyremarks = read_variety_metadata(40)
+varietyproperties = {
+    "ethnologue": read_variety_metadata(25),
+    "name": read_variety_metadata(26, may_be_empty=False),
+    "shortname": read_variety_metadata(27),
+    "abbr": read_variety_metadata(28),
+    "genclass": read_variety_metadata(29),
+    "quality": read_variety_metadata(30),
+    "altname": read_variety_metadata(31),
+    "locale": read_variety_metadata(32),
+    "collcoun": read_variety_metadata(33),
+    "remarks1": read_variety_metadata(34),
+    "remarks2": read_variety_metadata(35),
+    "remarks3": read_variety_metadata(36),
+    "unpub": read_variety_metadata(37),
+    "source1": read_variety_metadata(38),
+    "source2": read_variety_metadata(39),
+    "remarks": read_variety_metadata(40)}
 #vvvvvvvvvv Varieties Information End vvvvvvvvvv
 
 
@@ -188,13 +193,12 @@ release = '<WordCorr release="Release 2.0" version="2.1">\n'
 outp.write(release)
 
 #user info
-userid = '<user user-id="%(id)s" family-name="%(famname)s" given-name="%(name)s" email="%(email)s">\n' %\
-         {"id":userlist[0], "famname":userlist[1], "name":userlist[2], "email":userlist[4]}
+userid = '<user user-id="%(id)s" family-name="%(famname)s" given-name="%(name)s" email="%(email)s">\n' % userdata
 #print userid
 outp.write(userid)
 
 #affiliation
-affiliation = '<affiliations>%s</affiliations>\n'    % (userlist[3])
+affiliation = '<affiliations>%s</affiliations>\n'    % (userdata["affiliations"])
 #print affiliation
 outp.write(affiliation)
 
@@ -268,54 +272,54 @@ outp.write(var)
 
 #LOOP HERE FOR VARIETIES
 n=0
-for i in range(0, len(varietyname)):    #for however many varieties are there
+for i in range(0, len(varietyproperties["name"])):    #for however many varieties are there
 
 #var(x) name, shortname, abbreviation:
     vxinf = '            <variety name="%(varname)s" short-name="%(varshortn)s" abbreviation="%(varabb)s" ethnologue-code="%(varethn)s">\n' %\
-                {"varname":varietyname[i], "varshortn": varietyshortname[i], 'varabb': varietyabbr[i], 'varethn': varietyethnologue[i]}
+                {"varname":varietyproperties["name"][i], "varshortn": varietyproperties["shortname"][i], 'varabb': varietyproperties["abbr"][i], 'varethn': varietyproperties["ethnologue"][i]}
 #    print vxinf
     outp.write(vxinf)
 
 #var(x) alternate-name-list:
-    if varietyaltname[i] != '\n':
-        vanl = '                <alternate-name-list>%s</alternate-name-list>\n'  %(varietyaltname[i])
+    if varietyproperties["altname"][i] != '\n':
+        vanl = '                <alternate-name-list>%s</alternate-name-list>\n'  %(varietyproperties["altname"][i])
 #        print vanl
         outp.write(vanl)
 
 #var(x) classification:
-    if varietygenclass[i] != '\n':
-        vclass = '                <classification>%s</classification>\n'  %(varietygenclass[i])
+    if varietyproperties["genclass"][i] != '\n':
+        vclass = '                <classification>%s</classification>\n'  %(varietyproperties["genclass"][i])
 #       print vclass
         outp.write(vclass)
 
 #var(x) locale:
-    if varietylocale[i] != '\n':
-        vloc = '                <locale>%s</locale>\n' % varietylocale[i]
+    if varietyproperties["locale"][i] != '\n':
+        vloc = '                <locale>%s</locale>\n' % varietyproperties["locale"][i]
 #       print vloc
         outp.write(vloc)
 
 #var(x) quality:str
-    if varietyquality[i] != '\n':
-        vqual = '                <quality>%s</quality>\n' % varietyquality[i]
+    if varietyproperties["quality"][i] != '\n':
+        vqual = '                <quality>%s</quality>\n' % varietyproperties["quality"][i]
 #       print vqual
         outp.write(vqual)
 
 #var(x) source:
 #To avoid empty spaces or lines, the script takes into account which of the two lines
 #available in the spreadsheet are filled.
-    if varietysource1[i] != '' and varietysource2[i] != '':
+    if varietyproperties["source1"][i] != '' and varietyproperties["source2"][i] != '':
         vsour = '                <source>%(varsour)s</source>\n' %\
-                {'varsour': varietysource1[i]+', '+varietysource2[i]}
+                {'varsour': varietyproperties["source1"][i]+', '+varietyproperties["source2"][i]}
 #        print vsour
         outp.write(vsour)
-    elif varietysource1[i] == '':
+    elif varietyproperties["source1"][i] == '':
         vsour = '                <source>%(varsour)s</source>\n' %\
-                {'varsour':varietysource2[i]}
+                {'varsour':varietyproperties["source2"][i]}
 #        print vsour
         outp.write(vsour)
-    elif varietysource2[i] == '':
+    elif varietyproperties["source2"][i] == '':
         vsour = '                <source>%(varsour)s</source>\n' %\
-                {'varsour':varietysource1[i]}
+                {'varsour':varietyproperties["source1"][i]}
 #        print vsour
         outp.write(vsour)
     else:
@@ -324,12 +328,12 @@ for i in range(0, len(varietyname)):    #for however many varieties are there
         outp.write(vsour)
 
 #var(x) unpublished source:
-    vunpubsource = '                <unpublished-source>%s</unpublished-source>\n'    %(varietyunpub[i])
+    vunpubsource = '                <unpublished-source>%s</unpublished-source>\n'    %(varietyproperties["unpub"][i])
 #    print vunpubsource
     outp.write(vunpubsource)
 
 #var(x) country where collected:
-    vccoll = '                <country-where-collected>%s</country-where-collected>\n'  %(varietycollcoun[i])
+    vccoll = '                <country-where-collected>%s</country-where-collected>\n'  %(varietyproperties["collcoun"][i])
 #    print vccoll
     outp.write(vccoll)
 
@@ -339,14 +343,14 @@ for i in range(0, len(varietyname)):    #for however many varieties are there
 #and if they are empty, they are not included in Variety remarks,
 #in order to avoid empty spaces and lines.
     remarks = []
-    if varietyremarks[i]:
-        remarks.append(varietyremarks[i])
-    if varietyremarks1[i]:
-        remarks.append('Place where collected: '+varietyremarks1[i])
-    if varietyremarks2[i]:
-        remarks.append('Collected by: '+varietyremarks2[i])
-    if varietyremarks3[i]:
-        remarks.append('Date collected: '+varietyremarks3[i])
+    if varietyproperties["remarks"][i]:
+        remarks.append(varietyproperties["remarks"][i])
+    if varietyproperties["remarks1"][i]:
+        remarks.append('Place where collected: '+varietyproperties["remarks1"][i])
+    if varietyproperties["remarks2"][i]:
+        remarks.append('Collected by: '+varietyproperties["remarks2"][i])
+    if varietyproperties["remarks3"][i]:
+        remarks.append('Date collected: '+varietyproperties["remarks3"][i])
     if remarks:
         vrem = '                <remarks>%s</remarks>\n'  %(
             ", ".join(remarks))
@@ -407,7 +411,7 @@ for i in range(43, len(sprlist1)):
 #sprlist1: #, gl1, gl2, var1dat, var2dat, var3dat, var4dat, etc.
 datapre=[]
 for i in range(43, len(sprlist1)):          #excluding metadata
-    for j in range(3, len(varietyname)+3):  #data only, '+3' to get all data (first three items are #, gl1, gl2, then all variety data, '+3' to make up for first three skipped
+    for j in range(3, len(varietyproperties["name"])+3):  #data only, '+3' to get all data (first three items are #, gl1, gl2, then all variety data, '+3' to make up for first three skipped
         datapre.append(sprlist1[i][j])
 
 #this a list containing all datums in the following order:
@@ -471,7 +475,7 @@ for i in range(0, len(entrynumbers)):              #full length: entrynumbers
         for k in range(0, len(datasplit[i+l+m])):
             if datasplit[i+l+m][k] != '' and datasplit[i+l+m][k] != '\n':
                 datum = '                <datum datum-number="%(no)s" short-name="%(varshortn)s" datum="%(datm)s">\n' %\
-                    {'no' : i+k+m+l, 'varshortn' : varietyshortname[l], 'datm' : (datasplit[i+l+m][k]).strip()}    
+                    {'no' : i+k+m+l, 'varshortn' : varietyproperties["shortname"][l], 'datm' : (datasplit[i+l+m][k]).strip()}    
 #                print datum
                 outp.write(datum)   #.encode('utf-8'))   #encode as unicode
 
@@ -519,9 +523,9 @@ outp.write(remarks)
 
 #view info: short name, order number (generated here)
 #viewmember(x):
-for i in range(0, len(varietyname)):    #for all varieties
+for i in range(0, len(varietyproperties["name"])):    #for all varieties
     viewmem = '                <view-member short-name="%(varshortn)s" order-number="%(no)s" />\n' %\
-            {'varshortn': varietyshortname[i], 'no':i+1}
+            {'varshortn': varietyproperties["shortname"][i], 'no':i+1}
 #    print viewmem
     outp.write(viewmem)
 
