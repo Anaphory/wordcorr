@@ -172,6 +172,7 @@ varietyethnologue = read_variety_metadata(25, True)
 varietyname = read_variety_metadata(26, False)
 varietyshortname = read_variety_metadata(27, True)
 varietyabbr = read_variety_metadata(28, True)
+varietygenclass = read_variety_metadata(29, True)
 
 varietygenclasspre=[]
 for i in range(3, len(sprlist1[29])):
