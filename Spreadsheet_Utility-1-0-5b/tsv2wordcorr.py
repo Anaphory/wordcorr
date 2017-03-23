@@ -138,35 +138,19 @@ for i in range(0, len(colllistprelim)): #for this preliminary datalist
 #CREATES LISTS CONTAINING THE INFORMATION FROM THE VARIETIES
 
 #SET UP LISTS FOR VARIETY INFORMATION:
-varietyname=[]
-varietyshortname=[]
-varietyabbr=[]
-varietygenclass=[]
-varietyquality=[]
-varietyaltname=[]
-varietylocale=[]    #where spoken
-varietycollcoun=[]
-varietyunpub=[]
-varietysource1=[]
-varietysource2=[]
-varietyremarks=[]
-varietyremarks1=[]
-varietyremarks2=[]
-varietyremarks3=[]
-
 def read_variety_metadata(row, may_be_empty=True):
-    varietyethnologue=[]
-    varietyethnologuepre=[]
+    varietyproperty=[]
+    varietypropertypre=[]
     for i in range(3, len(sprlist1[row])):
         if sprlist1[row][i] != '' or may_be_empty:         #don't append empty fields
-            varietyethnologuepre.append(sprlist1[row][i])
+            varietypropertypre.append(sprlist1[row][i])
             
-    for i in range(0, len(varietyethnologuepre)):   #for this preliminary varietyethn.
-        stripstring = varietyethnologuepre[i]       #convert to string
+    for i in range(0, len(varietypropertypre)):   #for this preliminary varietyethn.
+        stripstring = varietypropertypre[i]       #convert to string
         list = stripstring.strip()                 #strip off trailing empty spaces (prevent linebreaks in xml document
         list = list.strip('"')               #strip off quotation marks
-        varietyethnologue.append(list)              #append to varietyethn.
-    return varietyethnologue
+        varietyproperty.append(list)              #append to varietyethn.
+    return varietyproperty
 
 varietyethnologue = read_variety_metadata(25)
 varietyname = read_variety_metadata(26, may_be_empty=False)
@@ -177,12 +161,12 @@ varietyquality = read_variety_metadata(30)
 varietyaltname = read_variety_metadata(31)
 varietylocale = read_variety_metadata(32)
 varietycollcoun = read_variety_metadata(33)
-varietyunpub = read_variety_metadata(37)
-varietysource1 = read_variety_metadata(38)
-varietysource2 = read_variety_metadata(39)
 varietyremarks1 = read_variety_metadata(34)
 varietyremarks2 = read_variety_metadata(35)
 varietyremarks3 = read_variety_metadata(36)
+varietyunpub = read_variety_metadata(37)
+varietysource1 = read_variety_metadata(38)
+varietysource2 = read_variety_metadata(39)
 varietyremarks = read_variety_metadata(40)
 #vvvvvvvvvv Varieties Information End vvvvvvvvvv
 
@@ -363,13 +347,11 @@ for i in range(0, len(varietyname)):    #for however many varieties are there
         remarks.append('Collected by: '+varietyremarks2[i])
     if varietyremarks3[i]:
         remarks.append('Date collected: '+varietyremarks3[i])
-
     if remarks:
         vrem = '                <remarks>%s</remarks>\n'  %(
             ", ".join(remarks))
     else:
         vrem = '                <remarks />\n'
-
     outp.write(vrem)
 #var(x) close
     vxclos = '            </variety>\n'
