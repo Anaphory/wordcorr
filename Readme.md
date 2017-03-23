@@ -1,5 +1,7 @@
-bmyWordCorr Release 2.0
-Copyright (c) 2002 DataHouse, Inc. All rights reserved.
+# WordCorr
+Copyright (c) 2002 DataHouse, Inc.
+
+According to [its website](http://www.wordcorr.org/3-who_made_it.htm) and [sourceforge page](https://sourceforge.net/projects/wordcorr/), WordCorr is published under Articstic License.
 
 ___________________
 SYSTEM REQUIREMENTS
