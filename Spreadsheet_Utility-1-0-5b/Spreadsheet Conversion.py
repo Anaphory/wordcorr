@@ -1,72 +1,75 @@
 # -*- coding: cp1252 -*-
-#THIS PROGRAM WILL TAKE A TAB DELIMITED VERSION OF AN EXCEL TABLE AND
-#CONVERT IT TO xml IMPORTABLE INTO WORDCORR
+"""THIS PROGRAM WILL TAKE A TAB DELIMITED VERSION OF AN EXCEL TABLE AND
+CONVERT IT TO xml IMPORTABLE INTO WORDCORR
 
-#USER GUIDE - DISREGARD IF YOU HAVE THE EXCEL USER GUIDE
-#Spreadsheet Conversion User Guide
-#B.R. Maria Faehndrich
-#System requirements:
-#Python 2.3 or higher (program may also run on versions as low as Python 2.1, but Python 2.3 is recommended.)
+USER GUIDE - DISREGARD IF YOU HAVE THE EXCEL USER GUIDE
+Spreadsheet Conversion User Guide
+B.R. Maria Faehndrich
+System requirements:
+Python 2.3 or higher (program may also run on versions as low as Python 2.1, but Python 2.3 is recommended.)
 
-#Instructions for getting Python:
-#This conversion program is written in Python. To get your own version of Python follow these steps:
-#1.       Go to http://www.python.org/.
-#2.       Click on Python 2.3 (or more recent version).
-#3.       Follow instructions on the Web page.
-#4.       I recommend installing Python under C:/Program Files.
+Instructions for getting Python:
+This conversion program is written in Python. To get your own version of Python follow these steps:
+1.       Go to http://www.python.org/.
+2.       Click on Python 2.3 (or more recent version).
+3.       Follow instructions on the Web page.
+4.       I recommend installing Python under C:/Program Files.
 
-#Instructions for filling in the spreadsheet:
-#1.       Follow the outline provided in the sample Put your data in the blank sheet.
-#2.       Do not insert any additional cells, rows, or columns, except that you may add as many varieties with their metadata as you need, and as many entries as you need.
-#3.       For the fields "Your Role as Creator" and "Rights management", keep one of the items given in the sample spreadsheet. The program will not work if you fill in anything else.
-#4.       Separate multiple datums for one variety in the same entry by commas.
+Instructions for filling in the spreadsheet:
+1.       Follow the outline provided in the sample Put your data in the blank sheet.
+2.       Do not insert any additional cells, rows, or columns, except that you may add as many varieties with their metadata as you need, and as many entries as you need.
+3.       For the fields "Your Role as Creator" and "Rights management", keep one of the items given in the sample spreadsheet. The program will not work if you fill in anything else.
+4.       Separate multiple datums for one variety in the same entry by commas.
 
-#Instructions for converting spreadsheet to xml file:
-#1.       Go to File, Save as.
-#2.       Save as type: “Unicode Text” (only the active sheet can be saved, features incompatible with the format will be left out).
-#3.       Save the file in the same folder that contains the Spreadsheet Conversion program (has to be within your Python folder).
-#4.       Close the Excel file.
-#5.       Open the text file you just created. Before you save it, please remove any empty lines and spaces at the end, as they may cause the conversion to crash.
-#6.       Go to File, Save as:
-   #a)      Keep file name location.
-   #b)      Save as type: Text Documents (*.txt).
-   #c)      Encoding: change to utf-8.
-   #d)      If you are asked whether you want to replace the existing file, click Yes.
-   #e)      Close the text file.
-   #f)      Delete any empty lines at the bottom of the document.
+Instructions for converting spreadsheet to xml file:
+1.       Go to File, Save as.
+2.       Save as type: “Unicode Text” (only the active sheet can be saved, features incompatible with the format will be left out).
+3.       Save the file in the same folder that contains the Spreadsheet Conversion program (has to be within your Python folder).
+4.       Close the Excel file.
+5.       Open the text file you just created. Before you save it, please remove any empty lines and spaces at the end, as they may cause the conversion to crash.
+6.       Go to File, Save as:
+   a)      Keep file name location.
+   b)      Save as type: Text Documents (*.txt).
+   c)      Encoding: change to utf-8.
+   d)      If you are asked whether you want to replace the existing file, click Yes.
+   e)      Close the text file.
+   f)      Delete any empty lines at the bottom of the document.
 
-#Instructions for using conversion program:
-#1.       Make sure that Python, the Spreadsheet Conversion script, and the text file with the input are all in the same directory.
-#2.       To do this, create a new folder in your python folder and call it "Python WordCorr" (or any other name that will make sense to you).
-#3.       Download the Python script Spreadsheet Conversion into this folder. (In order to make it easier for you to find it, you may want to put a shortcut on the desktop: right click, click on “create Shortcut”, and then drag the shortcut onto the desktop. This will make using the script a lot easier, especially if you are going to use option II below.)
-#4.       Place your input file in your "Python WordCorr" folder in the Python folder.
-#5.       There are two ways to start the conversion program:
+Instructions for using conversion program:
+1.       Make sure that Python, the Spreadsheet Conversion script, and the text file with the input are all in the same directory.
+2.       To do this, create a new folder in your python folder and call it "Python WordCorr" (or any other name that will make sense to you).
+3.       Download the Python script Spreadsheet Conversion into this folder. (In order to make it easier for you to find it, you may want to put a shortcut on the desktop: right click, click on “create Shortcut”, and then drag the shortcut onto the desktop. This will make using the script a lot easier, especially if you are going to use option II below.)
+4.       Place your input file in your "Python WordCorr" folder in the Python folder.
+5.       There are two ways to start the conversion program:
 
-#I.
-#a)      Go to Start, Programs, Python (2.3), IDLE (Python GUI).
-#b)      the Python shell will open.
-#c)      Go to File, Open. Find Spreadsheet Conversion in the Open window.
-#d)      Double click on Spreadsheet Conversion.
-#e)      In the window that opens with the conversion script, click on Run, Run Module (or you can hit the F5 button).
-#f)       Follow the prompts that will be printed in the Python shell window.
+I.
+a)      Go to Start, Programs, Python (2.3), IDLE (Python GUI).
+b)      the Python shell will open.
+c)      Go to File, Open. Find Spreadsheet Conversion in the Open window.
+d)      Double click on Spreadsheet Conversion.
+e)      In the window that opens with the conversion script, click on Run, Run Module (or you can hit the F5 button).
+f)       Follow the prompts that will be printed in the Python shell window.
 
-#II.
-#a)      Find the Conversion script in My Computer. Double-click on it.
-#b)      Follow the instructions in the window that opens.
+II.
+a)      Find the Conversion script in My Computer. Double-click on it.
+b)      Follow the instructions in the window that opens.
 
-#To import your collection into WordCorr:
-#1. Open WordCorr.
-#2. Go to File, Import XML.
-#3. Find your collection in the Open window.
-#4. Double click on your file.
+To import your collection into WordCorr:
+1. Open WordCorr.
+2. Go to File, Import XML.
+3. Find your collection in the Open window.
+4. Double click on your file.
 
-#Note: WordCorr will attach the current user's ID, name, and email address as "publisher"
-#to any collection exported from WordCorr that does not already have these attached.
-#This means that if the person importing a collection into WordCorr is not the user indicated
-#in the spreadsheet, there will be a mismatch between the actual creator and publisher of the collection
-#and the user and publisher that appears in the exported file.
+Note: WordCorr will attach the current user's ID, name, and email address as "publisher"
+to any collection exported from WordCorr that does not already have these attached.
+This means that if the person importing a collection into WordCorr is not the user indicated
+in the spreadsheet, there will be a mismatch between the actual creator and publisher of the collection
+and the user and publisher that appears in the exported file.
 
-######################################################################
+#####################################################################
+"""
+
+import sys
 
 #double check:
 print("\nPlease make sure that:\n\
@@ -79,14 +82,17 @@ print("\nPlease make sure that:\n\
 import string
 
 #IMPORT DATA AND CREATE LIST WITH ENTRIES (TAKING OFF TRAILING SPACES)
-while 1:
-    try:
-        input = input("Please type complete name of your input file, including extension (e.g. Austronesian.txt): ")
-        inp = open(input,"r")   #takes raw input from above and uses it as input for the conversion
-        break
-    except IOError: #If there is a spelling error, or if the file is not in the correct directory
-        print("\nThis file cannot be found. Please try again.\n")
-    
+try:
+    inp = open(sys.argv[1])
+except (IndexError, IOError):
+    while 1:
+        try:
+            file = input("Please type complete name of your input file, including extension (e.g. Austronesian.txt): ")
+            inp = open(input,"r")   #takes raw input from above and uses it as input for the conversion
+            break
+        except IOError: #If there is a spelling error, or if the file is not in the correct directory
+            print("\nThis file cannot be found. Please try again.\n")
+
 #CREATE LIST FROM DATA, SPLIT BY 'TAB'
 sprlist = []
 sprstring = ''
