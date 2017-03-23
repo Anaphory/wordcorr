@@ -1,0 +1,51 @@
+Wordcorr from Spreadsheet								
+Joseph E. Grimes and B.R.Maria Faehndrich, University of Hawai`I at Manoa								
+Copy your word lists into this spreadsheet, fill in the metadata, convert to Unicode Text, then to								
+ UTF-8 encoded text, and Spreadsheet Conversion will convert everything into a Wordcorr collection.								
+Metadata about you: (fields with * must have a value)								
+  Your unique ID (1-8 chars)*			JG					
+  Family name(s) for sorting*			Grimes					
+  Given name and initials*			Joseph E.					
+  Your institutional affiliation(s)*			SIL International; University of Hawai`I at Manoa					
+  Your email*			joe_grimes@sil.org					
+Metadata about this collection:								
+  Collection Title*			South Sulawesi					
+  Short title*			SulSel12					
+  Your Role as Creator (keep one)*			annotator, author, compiler, editor, researcher, transcriber					
+  Contributors' Names								
+  Primary gloss language*			English					
+    Its language code*			ENG					
+  Secondary gloss language			Bahasa Indonesia					
+    Its language code			INZ					
+  Keywords for searching			Austronesian, Sulawesi, Indonesia					
+  Description*			Twelve speech varieties of South Sulawesi, Indonesia, from survey trips in 1982 and 1983, imported from WordSurv file constructed by Joseph E. Grimes.					
+  Remarks			12 varieties, 202 entries. Short names of varieties and secondary glosses added from monograph.					
+  Published source(s):			Grimes, Charles E. and Grimes, Barbara D. 1987. Languages of South Sulawesi (Materials in Languages of Indonesia, No. 38, W. A. L. Stokhof, Series Editor). Pacific Linguistics Series D - No. 78. Pp. i-viii, 1-208.					
+    (one source per line)								
+  Geographic area covered			Southern Peninsula of Sulawesi and Selayar Island					
+  Stable copy located at			Linguistics Department, Research Center for Pacific Studies, The Australian National University, Canberra, ACT 2601, Australia					
+   Rights management (keep one)			Open Publishing, Common Content, GNU Publishing					
+  Year Copyright Asserted			2003					
+Metadata about the varieties, one variety per column:								
+			Variety 1	Variety 2	Variety 3	Variety 4	Variety 5	Variety 6
+  Language code (Ethnologue)*			MSR	KJC	SLY			
+  Full variety name*			Makassar of Gowa	Konjo of Pesisir (Coastal)	Selayar			
+  Short name (1-8 char)*			Mak	Knj	Sel			
+  Abbreviation (1-3 char)			M	K	S			
+  Genetic classification			genclassM	genclassK	genclassS			
+  Quality			B	A	A			
+  Alternate language name(s):				Konjo				
+  Where spoken:*			Makassar City and environs	East coast of southern peninsula	Selayar Island			
+  Country where collected:			Indonesia	Indonesia				
+  Place where collected			Malino, Gowa					
+  Collected by			Charles Grimes	Charles Grimes	Charles Grimes			
+  Date collected			1984	1984	1984			
+  Unpublished source:			Tjako (70 years); Umi Daeng Bau' (41 years)	six men in Tanalemo				
+  Published source(s):			Grimes, Charles E. and Grimes, Barbara D. 1987. Languages of South Sulawesi (Materials in Languages of Indonesia, No. 38, W. A. L. Stokhof, Series Editor). Pacific Linguistics Series D - No. 78. Pp. i-viii, 1-208.	Grimes, Charles E. and Grimes, Barbara D. 1987. Languages of South Sulawesi (Materials in Languages of Indonesia, No. 38, W. A. L. Stokhof, Series Editor). Pacific Linguistics Series D - No. 78. Pp. i-viii, 1-208.	Grimes, Charles E. and Grimes, Barbara D. 1987. Languages of South Sulawesi (Materials in Languages of Indonesia, No. 38, W. A. L. Stokhof, Series Editor). Pacific Linguistics Series D - No. 78. Pp. i-viii, 1-208.			
+    (one source per line)								
+  Remarks on the variety:			B implosive > ɓ, R trill > r N vB implosive > ɓ, R trill > r N velar > ŋ; J alveopalatal > ʤ, c palatal J>j, D fricative > ð, O open > ɔ	Collected by Charles E. Grimes at Tanalemo, Bulukumba, 1984.				
+Entries, one variety per column:								
+Entry num	Gloss 1	Gloss 2	Variety 1	Variety 2	Variety 3	Variety 4	Variety 5	Variety 6
+1	tree	pohon	poko?	poko?	po?oN			
+2	leaf	daun	leko?	rauN	taha			
+3	root	akar	aka?	aka?	aka?			
