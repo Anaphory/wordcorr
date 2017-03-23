@@ -154,12 +154,13 @@ varietyremarks1=[]
 varietyremarks2=[]
 varietyremarks3=[]
 
-def read_variety_metadata(row):
+def read_variety_metadata(row, may_be_empty=True):
     varietyethnologue=[]
     varietyethnologuepre=[]
     for i in range(3, len(sprlist1[row])):
-        if sprlist1[row][i] != '\n':         #don't append empty fields
+        if sprlist1[row][i] != '' or may_be_empty:         #don't append empty fields
             varietyethnologuepre.append(sprlist1[row][i])
+            
     for i in range(0, len(varietyethnologuepre)):   #for this preliminary varietyethn.
         stripstring = varietyethnologuepre[i]       #convert to string
         list = stripstring.strip()                 #strip off trailing empty spaces (prevent linebreaks in xml document
@@ -167,43 +168,10 @@ def read_variety_metadata(row):
         varietyethnologue.append(list)              #append to varietyethn.
     return varietyethnologue
 
-varietyethnologue = read_variety_metadata(25)
-    
-varietynamepre=[]
-for i in range(3, len(sprlist1[26])):
-    if sprlist1[26][i] != '\n' and sprlist1[26][i] != '':         #don't append empty fields
-        varietynamepre.append(sprlist1[26][i])
-for i in range(0, len(varietynamepre)): #for this preliminary varietyname
-    stripstring = varietynamepre[i]     #convert to string
-    list = stripstring.strip()         #strip off trailing empty spaces (prevent linebreaks in xml document
-    list = list.strip('"')
-    varietyname.append(list)            #append to varietyname
-#print "Variety Name:"
-#print varietyname
-
-varietyshortnamepre=[]
-for i in range(3, len(sprlist1[27])):
-    if sprlist1[27][i] != '\n':                 #don't append empty fields
-        varietyshortnamepre.append(sprlist1[27][i])
-for i in range(0, len(varietyshortnamepre)):    #for this preliminary varietyshortname
-    stripstring = varietyshortnamepre[i]        #convert to string
-    list = stripstring.strip()                 #strip off trailing empty spaces (prevent linebreaks in xml document
-    list = list.strip('"')
-    varietyshortname.append(list)               #append to varietyshortname
-#print "Variety Short Name:"
-#print varietyshortname
-
-varietyabbrpre=[]
-for i in range(3, len(sprlist1[28])):
-    if sprlist1[28][i] != '\n':         #don't append empty fields
-        varietyabbrpre.append(sprlist1[28][i])
-for i in range(0, len(varietyabbrpre)): #for this preliminary varietyabbr
-    stripstring = varietyabbrpre[i]     #convert to string
-    list = stripstring.strip()         #strip off trailing empty spaces (prevent linebreaks in xml document
-    list = list.strip('"')
-    varietyabbr.append(list)            #append to varietyabbr
-#print "Variety Abbreviation:"
-#print varietyabbr
+varietyethnologue = read_variety_metadata(25, True)
+varietyname = read_variety_metadata(26, False)
+varietyshortname = read_variety_metadata(27, True)
+varietyabbr = read_variety_metadata(28, True)
 
 varietygenclasspre=[]
 for i in range(3, len(sprlist1[29])):
