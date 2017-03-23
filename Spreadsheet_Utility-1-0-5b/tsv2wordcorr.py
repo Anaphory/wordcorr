@@ -366,7 +366,7 @@ for i in range(0, len(varietyname)):    #for however many varieties are there
 
     if remarks:
         vrem = '                <remarks>%s</remarks>\n'  %(
-            ",".join(remarks))
+            ", ".join(remarks))
     else:
         vrem = '                <remarks />\n'
 
