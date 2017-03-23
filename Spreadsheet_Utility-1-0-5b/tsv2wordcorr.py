@@ -70,42 +70,33 @@ and the user and publisher that appears in the exported file.
 """
 
 import sys
+import argparse
 
-#double check:
-print("\nPlease make sure that:\n\
-1. your input file is is a simple text file with encoding 'utf-8'\n\
-2. your input file is in the same directory as the Spreadsheet Conversion script\n\
-3. the folder containing your input file and the Spreadsheet Conversion script is located in your Python folder\n\
-\n")
+parser = argparse.ArgumentParser(
+    description = """This program will take a tab delimited version of an excel table
+    and convert it to xml importable into WordCorr""")
+parser.add_argument(
+    "input", type=argparse.FileType("r"), nargs="?",
+    default=sys.stdin,
+    help="""The tab-separated spread sheet to read data from, must be in a very
+    specific format.""")
+parser.add_argument(
+    "output", type=argparse.FileType("w"), nargs="?",
+    default=sys.stdout,
+    help="Path of the xml file to be written")
+args = parser.parse_args()
 
-#*********************************************
-import string
-
-#IMPORT DATA AND CREATE LIST WITH ENTRIES (TAKING OFF TRAILING SPACES)
-try:
-    inp = open(sys.argv[1])
-except (IndexError, IOError):
-    while 1:
-        try:
-            file = input("Please type complete name of your input file, including extension (e.g. Austronesian.txt): ")
-            inp = open(input,"r")   #takes raw input from above and uses it as input for the conversion
-            break
-        except IOError: #If there is a spelling error, or if the file is not in the correct directory
-            print("\nThis file cannot be found. Please try again.\n")
+inp = args.input
 
 #CREATE LIST FROM DATA, SPLIT BY 'TAB'
-sprlist = []
-sprstring = ''
 sprlist1 = []
-for line in inp.readlines():	#read each line in the input and do the following:  
-    sprlist.append(line)	#append each line to sprlist
-for i in range(5, len(sprlist)):
-    sprstring = sprlist[i]          #this makes the list splitable
-    list = sprstring.split('\t')    #separate nos/glosses, nos or letters and header info
+for i, line in enumerate(inp):	#read each line in the input and do the following:  
+    if i < 5:
+        # File header with instructions
+        continue
+    
+    list = line.strip("\n").split('\t')    #separate nos/glosses, nos or letters and header info
     sprlist1.append(list)
-#for i in range(0, len(sprlist1)):
-#    print sprlist1[i]
-#print sprlist1[5]
 
 #USER INFORMATION:
 userlistprelim = []           #create a list of all data filled in by the user
@@ -147,7 +138,6 @@ for i in range(0, len(colllistprelim)): #for this preliminary datalist
 #CREATES LISTS CONTAINING THE INFORMATION FROM THE VARIETIES
 
 #SET UP LISTS FOR VARIETY INFORMATION:
-varietyethnologue=[]
 varietyname=[]
 varietyshortname=[]
 varietyabbr=[]
@@ -164,18 +154,21 @@ varietyremarks1=[]
 varietyremarks2=[]
 varietyremarks3=[]
 
-varietyethnologuepre=[]
-for i in range(3, len(sprlist1[25])):
-    if sprlist1[25][i] != '\n':         #don't append empty fields
-        varietyethnologuepre.append(sprlist1[25][i])
-for i in range(0, len(varietyethnologuepre)):   #for this preliminary varietyethn.
-    stripstring = varietyethnologuepre[i]       #convert to string
-    list = stripstring.strip()                 #strip off trailing empty spaces (prevent linebreaks in xml document
-    list = list.strip('"')               #strip off quotation marks
-    varietyethnologue.append(list)              #append to varietyethn.
-#print "Ethnologue Code:"
-#print varietyethnologue
+def read_variety_metadata(row):
+    varietyethnologue=[]
+    varietyethnologuepre=[]
+    for i in range(3, len(sprlist1[row])):
+        if sprlist1[row][i] != '\n':         #don't append empty fields
+            varietyethnologuepre.append(sprlist1[row][i])
+    for i in range(0, len(varietyethnologuepre)):   #for this preliminary varietyethn.
+        stripstring = varietyethnologuepre[i]       #convert to string
+        list = stripstring.strip()                 #strip off trailing empty spaces (prevent linebreaks in xml document
+        list = list.strip('"')               #strip off quotation marks
+        varietyethnologue.append(list)              #append to varietyethn.
+    return varietyethnologue
 
+varietyethnologue = read_variety_metadata(25)
+    
 varietynamepre=[]
 for i in range(3, len(sprlist1[26])):
     if sprlist1[26][i] != '\n' and sprlist1[26][i] != '':         #don't append empty fields
@@ -364,9 +357,8 @@ for i in range(0, len(varietyremarkspre)):      #for this preliminary varietyrem
 
 #PRODUCE XML FILE:
 #print "\nXML FILE:"
-output = input("Enter name for xml file (e.g. AustronesianCollection) ")
 
-outp = open(output,"w")
+outp = args.output
 
 #header information:
 encoding = '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -850,11 +842,3 @@ outp.write(z)
 
 #close "output"
 outp.close()
-
-print("\n***Conversion completed.***\n")
-
-print("To import your collection into WordCorr:\n\
-1. Open WordCorr\n\
-2. Go to File, Import XML.\n\
-3. Find your collection in the Open window.\n\
-4. Double click on your file.\n")
