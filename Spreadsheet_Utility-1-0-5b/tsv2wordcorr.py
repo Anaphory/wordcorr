@@ -168,157 +168,22 @@ def read_variety_metadata(row, may_be_empty=True):
         varietyethnologue.append(list)              #append to varietyethn.
     return varietyethnologue
 
-varietyethnologue = read_variety_metadata(25, True)
-varietyname = read_variety_metadata(26, False)
-varietyshortname = read_variety_metadata(27, True)
-varietyabbr = read_variety_metadata(28, True)
-varietygenclass = read_variety_metadata(29, True)
-
-varietygenclasspre=[]
-for i in range(3, len(sprlist1[29])):
-    varietygenclasspre.append(sprlist1[29][i])
-for i in range(0, len(varietygenclasspre)): #for this preliminary varietgenclass
-    stripstring = varietygenclasspre[i]     #convert to string
-    list = stripstring.strip()             #strip off trailing empty spaces (prevent linebreaks in xml document
-    list = list.strip('"')
-    varietygenclass.append(list)            #append to varietygenclass
-#print "Genetic classification:"
-#print varietygenclass
-
-varietyqualitypre=[]
-for i in range(3, len(sprlist1[30])):
-    varietyqualitypre.append(sprlist1[30][i])
-for i in range(0, len(varietyqualitypre)):      #for this preliminary varietyquality
-    stripstring = varietyqualitypre[i]          #convert to string
-    list = stripstring.strip()                 #strip off trailing empty spaces (prevent linebreaks in xml document
-    list = list.strip('"')
-    varietyquality.append(list)                 #append to varietyquality
-#print "Variety quality:"
-#print varietyquality
-
-varietyaltnamepre=[]
-for i in range(3, len(sprlist1[31])):
-    varietyaltnamepre.append(sprlist1[31][i])
-for i in range(0, len(varietyaltnamepre)):      #for this preliminary varietyaltname
-    stripstring = varietyaltnamepre[i]          #convert to string
-    list = stripstring.strip()                 #strip off trailing empty spaces (prevent linebreaks in xml document
-    list = list.strip('"')
-    varietyaltname.append(list)                 #append to varietyaltname
-#print "Alternate language name(s):"
-#print varietyaltname
-
-varietylocalepre=[]
-for i in range(3, len(sprlist1[32])):
-    varietylocalepre.append(sprlist1[32][i])
-for i in range(0, len(varietylocalepre)):   #for this preliminary varietylocale
-    stripstring = varietylocalepre[i]       #convert to string
-    list = stripstring.strip()             #strip off trailing empty spaces (prevent linebreaks in xml document
-    list = list.strip('"')
-    varietylocale.append(list)              #append to varietylocale
-#print "Where spoken:"
-#print varietylocale
-
-varietycollcounpre=[]
-for i in range(3, len(sprlist1[33])):
-    varietycollcounpre.append(sprlist1[33][i])
-for i in range(0, len(varietycollcounpre)):     #for this preliminary varietycollcoun
-    stripstring = varietycollcounpre[i]         #convert to string
-    list = stripstring.strip()                 #strip off trailing empty spaces (prevent linebreaks in xml document
-    list = list.strip('"')
-    varietycollcoun.append(list)                #append to varietycollcoun
-#print "Country where collected:"
-#print varietycollcoun
-
-varietyunpubpre=[]
-for i in range(3, len(sprlist1[37])):
-    varietyunpubpre.append(sprlist1[37][i])
-for i in range(0, len(varietyunpubpre)):    #for this preliminary varietyunpub
-    stripstring = varietyunpubpre[i]        #convert to string
-    list = stripstring.strip()             #strip off trailing empty spaces (prevent linebreaks in xml document
-    list = list.strip('"')
-    varietyunpub.append(list)               #append to varietyunpub
-#print "Unpublished Source:"
-#print varietyunpub
-
-varietysource1pre=[]
-for i in range(3, len(sprlist1[38])):
-    varietysource1pre.append(sprlist1[38][i])
-for i in range(0, len(varietysource1pre)):      #for this preliminary varietysource
-    stripstring = varietysource1pre[i]          #convert to string
-    list = stripstring.strip()                 #strip off trailing empty spaces (prevent linebreaks in xml document
-    list = list.strip('"')
-    varietysource1.append(list)                 #append to varietysource
-#print "Source1:"
-#print varietysource1
-
-varietysource2pre=[]
-for i in range(3, len(sprlist1[39])):
-    varietysource2pre.append(sprlist1[39][i])
-for i in range(0, len(varietysource2pre)):      #for this preliminary varietysource
-    stripstring = varietysource2pre[i]          #convert to string
-    list = stripstring.strip()                 #strip off trailing empty spaces (prevent linebreaks in xml document
-    list = list.strip('"')
-    varietysource2.append(list)                 #append to varietysource
-#print "Source2:"
-#print varietysource2
-
-#Variety remarks: sprlist1[34], sprlist1[35], sprlist1[36]
-varietyremarks1pre=[]
-for i in range(3, len(sprlist1[34])):
-    if sprlist1[34][i] != '\n' and sprlist1[34][i] != '':                 #don't append empty fields
-        varietyremarks1pre.append(sprlist1[34][i])
-    else:
-        varietyremarks1pre.append('*')
-for i in range(0, len(varietyremarks1pre)):     #for this preliminary varietyremarks
-    stripstring = varietyremarks1pre[i]         #convert to string
-    list = stripstring.strip()                 #strip off trailing empty spaces (prevent linebreaks in xml document
-    list = list.strip('"')
-    varietyremarks1.append(list)                #append to varietyremarks
-#print "Remarks-1:"
-#print varietyremarks1
-
-varietyremarks2pre=[]
-for i in range(3, len(sprlist1[35])):
-    if sprlist1[35][i] != '\n' and sprlist1[35][i] != '':                 #don't append empty fields
-        varietyremarks2pre.append(sprlist1[35][i])
-    else:
-        varietyremarks2pre.append('*')
-for i in range(0, len(varietyremarks2pre)):     #for this preliminary varietyremarks
-    stripstring = varietyremarks2pre[i]         #convert to string
-    list = stripstring.strip()                 #strip off trailing empty spaces (prevent linebreaks in xml document
-    list = list.strip('"')
-    varietyremarks2.append(list)              #append to varietyremarks
-#print "Remarks-2:"
-#print varietyremarks2
-
-varietyremarks3pre=[]
-for i in range(3, len(sprlist1[36])):
-    if sprlist1[36][i] != '\n' and sprlist1[36][i] != '':                 #don't append empty fields
-        varietyremarks3pre.append(sprlist1[36][i])
-    else:
-        varietyremarks3pre.append('*')
-for i in range(0, len(varietyremarks3pre)):     #for this preliminary varietyremarks
-    stripstring = varietyremarks3pre[i]         #convert to string
-    list = stripstring.strip()                 #strip off trailing empty spaces (prevent linebreaks in xml document
-    list = list.strip('"')
-    varietyremarks3.append(list)                #append to varietyremarks
-#print "Remarks-3:"
-#print varietyremarks3
-
-varietyremarkspre=[]
-for i in range(3, len(sprlist1[40])):
-    if sprlist1[40][i] != '\n' and sprlist1[40][i] != '':                 #don't append empty fields
-        varietyremarkspre.append(sprlist1[40][i])
-    else:
-        varietyremarkspre.append('*')
-for i in range(0, len(varietyremarkspre)):      #for this preliminary varietyremarks
-    stripstring = varietyremarkspre[i]          #convert to string
-    list = stripstring.strip()                 #strip off trailing empty spaces (prevent linebreaks in xml document
-    list = list.strip('"')
-    varietyremarks.append(list)                 #append to varietyremarks
-#print "Remarks:"
-#print varietyremarks
-
+varietyethnologue = read_variety_metadata(25)
+varietyname = read_variety_metadata(26, may_be_empty=False)
+varietyshortname = read_variety_metadata(27)
+varietyabbr = read_variety_metadata(28)
+varietygenclass = read_variety_metadata(29)
+varietyquality = read_variety_metadata(30)
+varietyaltname = read_variety_metadata(31)
+varietylocale = read_variety_metadata(32)
+varietycollcoun = read_variety_metadata(33)
+varietyunpub = read_variety_metadata(37)
+varietysource1 = read_variety_metadata(38)
+varietysource2 = read_variety_metadata(39)
+varietyremarks1 = read_variety_metadata(34)
+varietyremarks2 = read_variety_metadata(35)
+varietyremarks3 = read_variety_metadata(36)
+varietyremarks = read_variety_metadata(40)
 #vvvvvvvvvv Varieties Information End vvvvvvvvvv
 
 
@@ -489,114 +354,47 @@ for i in range(0, len(varietyname)):    #for however many varieties are there
 #The following script checks whether the fields in question are filled,
 #and if they are empty, they are not included in Variety remarks,
 #in order to avoid empty spaces and lines.
-    if varietyremarks1[i] != '*': #or varietyremarks1[i] != '\n':
+    if varietyremarks1[i]:
         varietyremarks1x = 'Place where collected: '+varietyremarks1[i]
-    else:
-        varietyremarks1x = varietyremarks1[i]
-#    print varietyremarks1x
 
-    if varietyremarks2[i] != '*': #or varietyremarks2[i] !='\n':
+    if varietyremarks2[i]:
         varietyremarks2x = 'Collected by: '+varietyremarks2[i]
-    else:
-        varietyremarks2x = varietyremarks2[i]
-#    print varietyremarks2x
 
-    if varietyremarks3[i] != '*': #or varietyremarks3[i] !='\n':
+    if varietyremarks3[i]:
         varietyremarks3x = 'Date collected: '+varietyremarks3[i]
-    else:
-        varietyremarks3x = varietyremarks3[i]
-#    print varietyremarks3x
 
-#all there:
-    if varietyremarks[i] != '*' and varietyremarks1[i] != '*' and varietyremarks2[i] != '*' and varietyremarks3[i] != '*':
+    if varietyremarks[i] and varietyremarks1[i] and varietyremarks2[i] and varietyremarks3[i] :
         vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks[i]+ ', ' +varietyremarks1x+', '+varietyremarks2x +', '+varietyremarks3x)
-#        print vrem
-        outp.write(vrem)
-
-#varietyremarks missing:
-    if varietyremarks[i] == '*' and varietyremarks1[i] != '*' and varietyremarks2[i] != '*' and varietyremarks3[i] != '*':
+    if not varietyremarks[i] and varietyremarks1[i] and varietyremarks2[i] and varietyremarks3[i] :
         vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks1x+', '+varietyremarks2x +', '+varietyremarks3x)
-#        print vrem
-        outp.write(vrem)
-
-#varietyremarks + varietyremarks1 missing:
-    if varietyremarks[i] == '*' and varietyremarks1[i] == '*' and varietyremarks2[i] != '*' and varietyremarks3[i] != '*':
+    if varietyremarks[i] =='' and varietyremarks1[i] =='' and varietyremarks2[i]  and varietyremarks3[i] :
         vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks2x +', '+varietyremarks3x)
-#        print vrem
-        outp.write(vrem)
-
-#varietyremarks + varietyremarks2 missing:
-    if varietyremarks[i] == '*' and varietyremarks1[i] != '*' and varietyremarks2[i] == '*' and varietyremarks3[i] != '*':
+    if varietyremarks[i] =='' and varietyremarks1[i]  and varietyremarks2[i] =='' and varietyremarks3[i] :
         vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks1x+', '+varietyremarks3x)
-#        print vrem
-        outp.write(vrem)
-
-#varietyremarks + varietyremarks3 missing:
-    if varietyremarks[i] == '*' and varietyremarks1[i] != '*' and varietyremarks2[i] != '*' and varietyremarks3[i] == '*':
+    if varietyremarks[i] =='' and varietyremarks1[i]  and varietyremarks2[i]  and varietyremarks3[i] =='':
         vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks1x+', '+varietyremarks2x)
-#        print vrem
-        outp.write(vrem)
-
-#varietyremarks + varietyremarks1 + varietyremarks2 missing:
-    if varietyremarks[i] == '*' and varietyremarks1[i] == '*' and varietyremarks2[i] == '*' and varietyremarks3[i] != '*':
+    if varietyremarks[i] =='' and varietyremarks1[i] =='' and varietyremarks2[i] =='' and varietyremarks3[i] :
         vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks3x)
-#        print vrem
-        outp.write(vrem)
-
-#varietyremarks + varietyremarks1 + varietyremarks3 missing:
-    if varietyremarks[i] == '*' and varietyremarks1[i] == '*' and varietyremarks2[i] != '*' and varietyremarks3[i] == '*':
+    if varietyremarks[i] =='' and varietyremarks1[i] =='' and varietyremarks2[i]  and varietyremarks3[i] =='':
         vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks2x)
-#        print vrem
-        outp.write(vrem)
-
-#varietyremarks + varietyremarks2 + varietyremarks3 missing:
-    if varietyremarks[i] == '*' and varietyremarks1[i] != '*' and varietyremarks2[i] == '*' and varietyremarks3[i] == '*':
+    if varietyremarks[i] =='' and varietyremarks1[i]  and varietyremarks2[i] =='' and varietyremarks3[i] =='':
         vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks1x)
-#        print vrem
-        outp.write(vrem)
-
-#varietyremarks1 missing:
-    if varietyremarks[i] != '*' and varietyremarks1[i] == '*' and varietyremarks2[i] != '*' and varietyremarks3[i] != '*':
+    if varietyremarks[i]  and varietyremarks1[i] =='' and varietyremarks2[i]  and varietyremarks3[i] :
         vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks[i]+ ', ' +varietyremarks2x +', '+varietyremarks3x)
-#        print vrem
-        outp.write(vrem)        
-
-#varietyremarks1 + varietyremarks2 missing:
-    if varietyremarks[i] != '*' and varietyremarks1[i] == '*' and varietyremarks2[i] == '*' and varietyremarks3[i] != '*':
+    if varietyremarks[i]  and varietyremarks1[i] =='' and varietyremarks2[i] =='' and varietyremarks3[i] :
         vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks[i]+ ', ' +varietyremarks3x)
-#        print vrem
-        outp.write(vrem)
-
-#varietyremarks1 + varietyremarks3 missing:
-    if varietyremarks[i] != '*' and varietyremarks1[i] == '*' and varietyremarks2[i] != '*' and varietyremarks3[i] == '*':
+    if varietyremarks[i]  and varietyremarks1[i] =='' and varietyremarks2[i]  and varietyremarks3[i] =='':
         vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks[i]+ ', ' +varietyremarks2x)
-#        print vrem
-        outp.write(vrem)
-
-#varietyremarks1 + varietyremarks2 + varietyremarks3 missing:
-    if varietyremarks[i] != '*' and varietyremarks1[i] == '*' and varietyremarks2[i] == '*' and varietyremarks3[i] == '*':
+    if varietyremarks[i]  and varietyremarks1[i] =='' and varietyremarks2[i] =='' and varietyremarks3[i] =='':
         vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks[i])
-#        print vrem
-        outp.write(vrem)
-
-#varietyremarks2 missing:
-    if varietyremarks[i] != '*' and varietyremarks1[i] != '*' and varietyremarks2[i] == '*' and varietyremarks3[i] != '*':
+    if varietyremarks[i]  and varietyremarks1[i]  and varietyremarks2[i] =='' and varietyremarks3[i] :
         vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks[i]+ ', ' +varietyremarks1x+', '+varietyremarks3x)
-#        print vrem
-        outp.write(vrem)
-
-#varietyremarks2 + varietyremarks3 missing:
-    if varietyremarks[i] != '*' and varietyremarks1[i] != '*' and varietyremarks2[i] == '*' and varietyremarks3[i] == '*':
+    if varietyremarks[i]  and varietyremarks1[i]  and varietyremarks2[i] =='' and varietyremarks3[i] =='':
         vrem = '                <remarks>%s</remarks>\n'  %(varietyremarks[i]+ ', ' +varietyremarks1x)
-#        print vrem
-        outp.write(vrem)
-
-#all varietyremarks missing:
-    if varietyremarks[i] == '*' and varietyremarks1[i] == '*' and varietyremarks2[i] == '*' and varietyremarks3[i] == '*':
+    if varietyremarks[i] =='' and varietyremarks1[i] =='' and varietyremarks2[i] =='' and varietyremarks3[i] =='':
         vrem = '                <remarks />\n'
-#        print vrem
-        outp.write(vrem)
 
+    outp.write(vrem)
 #var(x) close
     vxclos = '            </variety>\n'
 #    print vxclos
