@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <WordCorr release="Release 2.0" version="2.1">
-<user user-id="" family-name="" given-name="" email="">
-<affiliations></affiliations>
+<user user-id="JG" family-name="Grimes" given-name="Joseph E." email="joe_grimes@sil.org">
+<affiliations>SIL International; University of Hawai`I at Manoa</affiliations>
     <collection name="South Sulawesi" short-name="SulSel12" gloss-language="English" gloss-language-code="ENG" secondary-gloss-language="Bahasa Indonesia" secondary-gloss-language-code="INZ" creator-role="annotator, author, compiler, editor, researcher, transcriber" creator="" publisher="" rights-management="Open Publishing, Common Content, GNU Publishing" rights-management-year-copyright-asserted="2003" export-timestamp="">
  <contributor></contributor>
 <description>Twelve speech varieties of South Sulawesi, Indonesia, from survey trips in 1982 and 1983, imported from WordSurv file constructed by Joseph E. Grimes.</description>
