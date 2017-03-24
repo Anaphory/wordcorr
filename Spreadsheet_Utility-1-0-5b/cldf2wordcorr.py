@@ -39,7 +39,9 @@ def read_language_metadata(tsvfile):
             "locale": '{:f}, {:f}'.format(variety["Lat"],
                                           variety["Lon"]),
             "collection_country": variety["Region"],
-            "remarks": variety["Comments"]
+            "collection_location": '',
+            "collector": '',
+            "remarks": variety["Comments"],
     
     """Language ID Family Language name (-dialect) Culture ISO_code
 Internal Glottolog Lat Lon Region Description Comments languagename

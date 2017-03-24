@@ -136,6 +136,11 @@ def read_varieties_metadata_from_sprlist(sprlist1):
                   for key, value in varietyproperties.items()}
                  for i, var in enumerate(varnames)]
 
+    for variety in varieties:
+        variety["source"] = list(filter(
+            None, [variety.pop("source1"),
+                   variety.pop("source2")]))
+
     return varieties
 
 def read_data_from_sprlist(sprlist1):
@@ -266,21 +271,12 @@ def write_xml(outp, userdata, collection, varietyproperties, entries, gloss1, gl
         # To avoid empty spaces or lines, the script takes into
         # account which of the two lines available in the spreadsheet
         # are filled.
-        if var["source1"] != '' and var["source2"] != '':
-            vsour = '                <source>%(varsour)s</source>\n' %\
-                    {'varsour': var["source1"]+', '+var["source2"]}
-            outp.write(vsour)
-        elif var["source1"] == '':
-            vsour = '                <source>%(varsour)s</source>\n' %\
-                    {'varsour':var["source2"]}
-            outp.write(vsour)
-        elif var["source2"] == '':
-            vsour = '                <source>%(varsour)s</source>\n' %\
-                    {'varsour':var["source1"]}
-            outp.write(vsour)
+        if var["source"]:
+            vsour = '                <source>%s</source>\n' %\
+                    ", ".join(var["source"])
         else:
             vsour = '                <source />\n'
-            outp.write(vsour)
+        outp.write(vsour)
 
         vunpubsource = '                <unpublished-source>%s</unpublished-source>\n'    %(var["unpub"])
         outp.write(vunpubsource)
