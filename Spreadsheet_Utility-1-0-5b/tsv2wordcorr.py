@@ -273,7 +273,7 @@ def write_xml(outp, userdata, collection, varietyproperties, entries, gloss1, gl
         # are filled.
         if var["source"]:
             vsour = '                <source>%s</source>\n' %\
-                    ", ".join(var["source"])
+                    "; ".join(var["source"])
         else:
             vsour = '                <source />\n'
         outp.write(vsour)

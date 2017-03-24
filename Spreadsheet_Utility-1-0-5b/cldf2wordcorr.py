@@ -41,11 +41,11 @@ def read_language_metadata(tsvfile):
             "collection_country": variety["Region"],
             "collection_location": '',
             "collector": '',
-            "remarks": variety["Comments"],
-    
-    """Language ID Family Language name (-dialect) Culture ISO_code
-Internal Glottolog Lat Lon Region Description Comments languagename
-db_Object"""
+            "collection_date": '',
+            "unpub": '',
+            "source": '',
+            "remarks": variety["Comments"]})
+    return varieties
 
 
 def read_collection_metadata(jsonfile):
@@ -74,9 +74,7 @@ if __name__ == '__main__':
     parser.add_argument(
         "data", type=argparse.FileType("r"),
         default=sys.stdin,
-        help=
-
-    """The file containing all data""")
+        help="""The file containing all data""")
     parser.add_argument(
         "collection", type=argparse.FileType("r"),
         default=sys.stdin,
