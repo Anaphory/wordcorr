@@ -62,8 +62,8 @@ def read_user_data_from_sprlist(sprlist1):
 
 def read_collection_data_from_sprlist(sprlist1):
     collection_names = [
-        "collname",
-        "collsname",
+        "name",
+        "id",
         "creatorrole",
         "contributor",
         "glosslg",
@@ -98,7 +98,7 @@ def read_collection_data_from_sprlist(sprlist1):
 
 def read_varieties_metadata_from_sprlist(sprlist1):
     # SET UP LISTS FOR VARIETY INFORMATION:
-    def read_variety_metadata(row, min_len=0):
+    def read_variety_metadata(row):
         varietyproperty=[]
         varietypropertypre=[]
         for i in range(3, len(sprlist1[row])):
@@ -106,8 +106,6 @@ def read_varieties_metadata_from_sprlist(sprlist1):
 
         while varietypropertypre and not varietypropertypre[-1]:
             varietypropertypre = varietypropertypre[:-1]
-        varietypropertypre = varietypropertypre + [''] * max(
-            min_len - len(varietypropertypre), 0)
 
         for stripstring in varietypropertypre:   # for this preliminary varietyethn.
             list = stripstring.strip()                 # strip off trailing empty spaces (prevent linebreaks in xml document
@@ -117,24 +115,28 @@ def read_varieties_metadata_from_sprlist(sprlist1):
 
     varnames = read_variety_metadata(26)
     varietyproperties = {
-        "ethnologue": read_variety_metadata(25, len(varnames)),
+        "ethnologue": read_variety_metadata(25),
         "name": varnames,
-        "shortname": read_variety_metadata(27, len(varnames)),
-        "abbr": read_variety_metadata(28, len(varnames)),
-        "genclass": read_variety_metadata(29, len(varnames)),
-        "quality": read_variety_metadata(30, len(varnames)),
-        "altname": read_variety_metadata(31, len(varnames)),
-        "locale": read_variety_metadata(32, len(varnames)),
-        "collection_country": read_variety_metadata(33, len(varnames)),
-        "remarks1": read_variety_metadata(34, len(varnames)),
-        "remarks2": read_variety_metadata(35, len(varnames)),
-        "remarks3": read_variety_metadata(36, len(varnames)),
-        "unpub": read_variety_metadata(37, len(varnames)),
-        "source1": read_variety_metadata(38, len(varnames)),
-        "source2": read_variety_metadata(39, len(varnames)),
-        "remarks": read_variety_metadata(40, len(varnames))}
-    # vvvvvvvvvv Varieties Information End vvvvvvvvvv
-    return varietyproperties
+        "shortname": read_variety_metadata(27),
+        "abbr": read_variety_metadata(28),
+        "genclass": read_variety_metadata(29),
+        "quality": read_variety_metadata(30),
+        "altname": read_variety_metadata(31),
+        "locale": read_variety_metadata(32),
+        "collection_country": read_variety_metadata(33),
+        "collection_location": read_variety_metadata(34),
+        "collector": read_variety_metadata(35),
+        "collection_date": read_variety_metadata(36),
+        "unpub": read_variety_metadata(37),
+        "source1": read_variety_metadata(38),
+        "source2": read_variety_metadata(39),
+        "remarks": read_variety_metadata(40)}
+
+    varieties = [{key: (value[i] if i < len(value) else "")
+                  for key, value in varietyproperties.items()}
+                 for i, var in enumerate(varnames)]
+
+    return varieties
 
 def read_data_from_sprlist(sprlist1):
     # Data starting line 65:
@@ -156,7 +158,7 @@ def read_data_from_sprlist(sprlist1):
 
         row = []
         data.append(row)
-        for j in range(len(varietyproperties["name"])):  # data only, 
+        for j in range(len(varietyproperties)):  # data only, 
             # first three items are # , gl1, gl2, then all variety data
             row.append([token.strip().strip('"')
                         for token in sprlist1[i][j+3].split(",")])
@@ -184,8 +186,8 @@ def write_xml(outp, userdata, collection, varietyproperties, entries, gloss1, gl
     outp.write(affiliation)
 
     # collection name and shortname:
-    collname = '    <collection name="%(collname)s" short-name="%(collsname)s"' % collection
-    # print collname
+    collname = '    <collection name="%(name)s" short-name="%(id)s"' % collection
+    # print name
     outp.write(collname)
 
     # primary and secondary gloss languages and other info:
@@ -239,51 +241,51 @@ def write_xml(outp, userdata, collection, varietyproperties, entries, gloss1, gl
     outp.write(var)
 
     # LOOP HERE FOR VARIETIES
-    for i in range(0, len(varietyproperties["name"])):    # for however many varieties are there
+    for i, var in enumerate(varietyproperties):    # for however many varieties are there
 
         vxinf = '            <variety name="%(varname)s" short-name="%(varshortn)s" abbreviation="%(varabb)s" ethnologue-code="%(varethn)s">\n' %\
-                    {"varname":varietyproperties["name"][i], "varshortn": varietyproperties["shortname"][i], 'varabb': varietyproperties["abbr"][i], 'varethn': varietyproperties["ethnologue"][i]}
+                    {"varname":var["name"], "varshortn": var["shortname"], 'varabb': var["abbr"], 'varethn': var["ethnologue"]}
         outp.write(vxinf)
 
-        if varietyproperties["altname"][i] != '\n':
-            vanl = '                <alternate-name-list>%s</alternate-name-list>\n'  %(varietyproperties["altname"][i])
+        if var["altname"] != '\n':
+            vanl = '                <alternate-name-list>%s</alternate-name-list>\n'  %(var["altname"])
             outp.write(vanl)
 
-        if varietyproperties["genclass"][i] != '\n':
-            vclass = '                <classification>%s</classification>\n'  %(varietyproperties["genclass"][i])
+        if var["genclass"] != '\n':
+            vclass = '                <classification>%s</classification>\n'  %(var["genclass"])
             outp.write(vclass)
 
-        if varietyproperties["locale"][i] != '\n':
-            vloc = '                <locale>%s</locale>\n' % varietyproperties["locale"][i]
+        if var["locale"] != '\n':
+            vloc = '                <locale>%s</locale>\n' % var["locale"]
             outp.write(vloc)
 
-        if varietyproperties["quality"][i] != '\n':
-            vqual = '                <quality>%s</quality>\n' % varietyproperties["quality"][i]
+        if var["quality"] != '\n':
+            vqual = '                <quality>%s</quality>\n' % var["quality"]
             outp.write(vqual)
 
         # To avoid empty spaces or lines, the script takes into
         # account which of the two lines available in the spreadsheet
         # are filled.
-        if varietyproperties["source1"][i] != '' and varietyproperties["source2"][i] != '':
+        if var["source1"] != '' and var["source2"] != '':
             vsour = '                <source>%(varsour)s</source>\n' %\
-                    {'varsour': varietyproperties["source1"][i]+', '+varietyproperties["source2"][i]}
+                    {'varsour': var["source1"]+', '+var["source2"]}
             outp.write(vsour)
-        elif varietyproperties["source1"][i] == '':
+        elif var["source1"] == '':
             vsour = '                <source>%(varsour)s</source>\n' %\
-                    {'varsour':varietyproperties["source2"][i]}
+                    {'varsour':var["source2"]}
             outp.write(vsour)
-        elif varietyproperties["source2"][i] == '':
+        elif var["source2"] == '':
             vsour = '                <source>%(varsour)s</source>\n' %\
-                    {'varsour':varietyproperties["source1"][i]}
+                    {'varsour':var["source1"]}
             outp.write(vsour)
         else:
             vsour = '                <source />\n'
             outp.write(vsour)
 
-        vunpubsource = '                <unpublished-source>%s</unpublished-source>\n'    %(varietyproperties["unpub"][i])
+        vunpubsource = '                <unpublished-source>%s</unpublished-source>\n'    %(var["unpub"])
         outp.write(vunpubsource)
 
-        vccoll = '                <country-where-collected>%s</country-where-collected>\n'  %(varietyproperties["collection_country"][i])
+        vccoll = '                <country-where-collected>%s</country-where-collected>\n'  %(var["collection_country"])
         outp.write(vccoll)
 
         # This is a combination of three fields out of the spreadsheet.
@@ -291,16 +293,17 @@ def write_xml(outp, userdata, collection, varietyproperties, entries, gloss1, gl
         # are filled, and if they are empty, they are not included in
         # Variety remarks, in order to avoid empty spaces and lines.
         remarks = []
-        if varietyproperties["remarks"][i]:
-            remarks.append(varietyproperties["remarks"][i])
-        if varietyproperties["remarks1"][i]:
-            remarks.append('Place where collected: '+varietyproperties["remarks1"][i])
-        if varietyproperties["remarks2"][i]:
-            remarks.append('Collected by: '+varietyproperties["remarks2"][i])
-        if varietyproperties["remarks3"][i]:
-            remarks.append('Date collected: '+varietyproperties["remarks3"][i])
+        if var["remarks"]:
+            remarks.append(var["remarks"])
+        if var["collection_location"]:
+            remarks.append(
+                'Place where collected: ' + var["collection_location"])
+        if var["collector"]:
+            remarks.append('Collected by: ' + var["collector"])
+        if var["collection_date"]:
+            remarks.append('Date collected: ' + var["collection_date"])
         if remarks:
-            vrem = '                <remarks>%s</remarks>\n'  %(
+            vrem = '                <remarks>%s</remarks>\n' % (
                 ", ".join(remarks))
         else:
             vrem = '                <remarks />\n'
@@ -316,7 +319,6 @@ def write_xml(outp, userdata, collection, varietyproperties, entries, gloss1, gl
     # data open:
     data = '        <data>\n'
     outp.write(data)
-    varieties=varietyproperties["name"]
 
     # entry number, gloss1, gloss2
     m=0
@@ -333,11 +335,11 @@ def write_xml(outp, userdata, collection, varietyproperties, entries, gloss1, gl
     # NON-UNIQUE DATUM NUMBERS ARE NOT A PROBLEM, SINCE EACH DATUM IS ASSIGNED A NEW NUMBER UPON IMPORT INTO WORDCORR
     # DATUM NUMBERS ASSIGNED HERE WILL NOT PERSIST
     # IF THIS COLLECTION IS EXPORTED FROM WORDCORR, THE DATUM NUMBERS WILL BE DIFFERENT FROM THE NUMBERS ASSIGNED HERE
-        for l in range(0, len(varieties)):
+        for l, var in enumerate(varietyproperties):
             for k, form in enumerate(forms[i][l]):
                 if form:
                     datum = '                <datum datum-number="%(no)s" short-name="%(varshortn)s" datum="%(datm)s">\n' %\
-                        {'no' : i+k+m+l, 'varshortn' : varietyproperties["shortname"][l], 'datm' : form}    
+                        {'no' : i+k+m+l, 'varshortn' : var["shortname"], 'datm' : form}    
                     outp.write(datum)   # .encode('utf-8'))   # encode as unicode
 
                     # special semantics of datum
@@ -351,7 +353,7 @@ def write_xml(outp, userdata, collection, varietyproperties, entries, gloss1, gl
                     # close datum
                     datcls = '                </datum>\n'
                     outp.write(datcls)
-        m=m+(len(varieties)-1)   # m=m+(len(varieties)-1)   
+        m=m+(len(varietyproperties)-1)   # m=m+(len(varieties)-1)   
     # *********VARx DATA closed***************
 
     # close entry
@@ -381,9 +383,9 @@ def write_xml(outp, userdata, collection, varietyproperties, entries, gloss1, gl
 
     # view info: short name, order number (generated here)
     # viewmember(x):
-    for i in range(0, len(varietyproperties["name"])):    # for all varieties
+    for i, var in enumerate(varietyproperties):    # for all varieties
         viewmem = '                <view-member short-name="%(varshortn)s" order-number="%(no)s" />\n' %\
-                {'varshortn': varietyproperties["shortname"][i], 'no':i+1}
+                {'varshortn': var["shortname"], 'no':i+1}
     # print viewmem
         outp.write(viewmem)
 
