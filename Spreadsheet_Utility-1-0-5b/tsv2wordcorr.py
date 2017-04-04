@@ -162,11 +162,12 @@ def read_data_from_sprlist(sprlist1):
         gloss2.append(list)
 
         row = []
-        data.append(row)
-        for j in range(len(varietyproperties)):  # data only, 
-            # first three items are # , gl1, gl2, then all variety data
+        data.append({"datum": row})
+        for j in range(len(varietyproperties)):  # data only, first
+            # three items are entry, gl1, gl2, then all variety data
             row.append([token.strip().strip('"')
                         for token in sprlist1[i][j+3].split(",")])
+
     return entries, gloss1, gloss2, data
 
 
@@ -176,7 +177,7 @@ def write_xml(outp, userdata, collection, varietyproperties, entries, gloss1, gl
     # print encoding
     outp.write(encoding)
 
-    release = '<WordCorr release="Release 2.0" version="2.1">\n'  
+    release = '<WordCorr release="Release 2.1" version="2.1">\n'  
     # print release
     outp.write(release)
 
@@ -186,17 +187,17 @@ def write_xml(outp, userdata, collection, varietyproperties, entries, gloss1, gl
     outp.write(userid)
 
     # affiliation
-    affiliation = '<affiliations>%s</affiliations>\n'    % (userdata["affiliations"])
+    affiliation = '<affiliations>%s</affiliations>\n' % (userdata["affiliations"])
     # print affiliation
     outp.write(affiliation)
 
     # collection name and shortname:
-    collname = '    <collection name="%(name)s" short-name="%(id)s"' % collection
+    collname = '    <collection name="%(id)s" short-name="%(name)s"' % collection
     # print name
     outp.write(collname)
 
     # primary and secondary gloss languages and other info:
-    glosslang = ' gloss-language="%(glosslg)s" gloss-language-code="%(lgcode1)s" secondary-gloss-language="%(glosslg2)s" secondary-gloss-language-code="%(lgcode2)s" creator-role="%(creatorrole)s" creator="" publisher="" rights-management="%(rights)s" rights-management-year-copyright-asserted="%(copyright)s" export-timestamp="">\n' % collection
+    glosslang = ' gloss-language="%(glosslanguage1)s" gloss-language-code="%(lgcode1)s" secondary-gloss-language="%(glosslanguage2)s" secondary-gloss-language-code="%(lgcode2)s" creator-role="%(creatorrole)s" creator="" publisher="" rights-management="%(rights)s" rights-management-year-copyright-asserted="%(copyright)s" export-timestamp="">\n' % collection
     # print glosslang
     outp.write(glosslang)
 
@@ -211,7 +212,7 @@ def write_xml(outp, userdata, collection, varietyproperties, entries, gloss1, gl
     outp.write(description)
 
     # collection remarks:
-    collrem = '        <remarks>%s</remarks>\n' % collection["remarks"]
+    collrem = '        <remarks>%s</remarks>\n' % collection["remarks"].replace("&", "&amp;")
     # print collrem
     outp.write(collrem)
 
@@ -249,7 +250,10 @@ def write_xml(outp, userdata, collection, varietyproperties, entries, gloss1, gl
     for i, var in enumerate(varietyproperties):    # for however many varieties are there
 
         vxinf = '            <variety name="%(varname)s" short-name="%(varshortn)s" abbreviation="%(varabb)s" ethnologue-code="%(varethn)s">\n' %\
-                    {"varname":var["name"], "varshortn": var["shortname"], 'varabb': var["abbr"], 'varethn': var["ethnologue"]}
+                    {"varname": var["name"].strip(),
+                     "varshortn": var["shortname"].strip(),
+                     'varabb': var["abbr"],
+                     'varethn': var["ethnologue"]}
         outp.write(vxinf)
 
         if var["altname"] != '\n':
@@ -303,6 +307,7 @@ def write_xml(outp, userdata, collection, varietyproperties, entries, gloss1, gl
                 ", ".join(remarks))
         else:
             vrem = '                <remarks />\n'
+        vrem = vrem.replace("&", "&amp;")
         outp.write(vrem)
 
         vxclos = '            </variety>\n'
@@ -317,10 +322,12 @@ def write_xml(outp, userdata, collection, varietyproperties, entries, gloss1, gl
     outp.write(data)
 
     # entry number, gloss1, gloss2
+
+    annotations = []
     m=0
     for i, entry in enumerate(entries):
-        entrynumgl = '            <entry entry-number="%(no)s" gloss="%(gloss1)s" secondary-gloss="%(gloss2)s">\n' %\
-                                                       {'no' : entries[i], 'gloss1' : gloss1[i], 'gloss2':gloss2[i]}
+        entrynumgl = '            <entry entry-number="%(no)s" gloss="%(gloss1)s" secondary-gloss="%(gloss2)s">\n' % (
+            {'no': entry, 'gloss1': gloss1[i], 'gloss2': gloss2[i]})
         outp.write(entrynumgl)
 
     # *********VARx DATA open***************       
@@ -335,9 +342,19 @@ def write_xml(outp, userdata, collection, varietyproperties, entries, gloss1, gl
             for k, form in enumerate(forms[i][l]):
                 if form:
                     datum = '                <datum datum-number="%(no)s" short-name="%(varshortn)s" datum="%(datm)s">\n' %\
-                        {'no' : i+k+m+l, 'varshortn' : var["shortname"], 'datm' : form}    
+                        {'no': i+k+m+l,
+                         'varshortn': var["shortname"],
+                         'datm': form["datum"].replace("<", "&lt;").replace(">", "&gt;")}
                     outp.write(datum)   # .encode('utf-8'))   # encode as unicode
 
+                    annotations.append(
+                        """<annotated-datum entry-number="{conceptid:}" tag="{tag:}" datum-number="{no:}" vector="{xs:}" metathesis="">
+                        <observations />
+                        </annotated-datum>
+                        """.format(conceptid=entry,
+                                   tag=form.get("tag", "?"),
+                                   no=i+k+m+l,
+                                   xs=form.get("vector", "x"*len(form))))
                     # special semantics of datum
                     specsem = '                    <special-semantics />\n'
                     outp.write(specsem)
@@ -385,9 +402,12 @@ def write_xml(outp, userdata, collection, varietyproperties, entries, gloss1, gl
     # print viewmem
         outp.write(viewmem)
 
-    # annotations:
-    annop = '                <annotations />\n'
-    # print annop
+    if annotations:
+        annop = """<annotations>
+        %s
+        </annotations>""" % "".join(annotations)
+    else:
+        annop = '                <annotations />\n'
     outp.write(annop)
 
     # results (Refine)

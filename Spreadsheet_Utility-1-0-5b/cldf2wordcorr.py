@@ -29,9 +29,9 @@ def read_language_metadata(tsvfile):
     for variety in csv.DictReader(tsvfile, dialect="excel-tab"):
         varieties.append({
             "ethnologue": variety["ISO_code"],
-            "name": variety["Language name (-dialect)"],
-            "shortname": variety["Language name (-dialect)"].split("-")[-1],
-            "abbr": variety["Language ID"],
+            "name": variety["Language name (-dialect)"].strip(),
+            "shortname": variety["Language name (-dialect)"].split("-")[-1][:7].strip(),
+            "abbr": variety["Language ID"].strip(),
             "genclass": variety["Family"],
             "quality": '',
             "altname": '',
@@ -70,9 +70,9 @@ def read_collection_metadata(jsonfile):
     for key in [
             "creatorrole",
             "contributor",
-            "glosslg",
+            "glosslanguage1",
             "lgcode1",
-            "glosslg2",
+            "glosslanguage2",
             "lgcode2",
             "keywords",
             "description",
@@ -84,6 +84,39 @@ def read_collection_metadata(jsonfile):
             "copyright"]:
         metadata.setdefault(key, "")
     return metadata
+
+
+def alignment_to_vector(alignment_string):
+    """Translate an Edictor alignment string to a WordCorr vector.
+
+    >>> alignment_to_vector("l a t")
+    'xxx'
+    >>> alignment_to_vector("o:")
+    '{xx}'
+    >>> alignment_to_vector("- t o: - l æ: ŋ")
+    '/x{xx}/x{xx}x'
+    >>> alignment_to_vector("b u l aN")
+    'xxx{xx}'
+
+    """
+    vector = ""
+    token = ""
+    for t in alignment_string.strip():
+        if t == "-":
+            token = "/"
+        elif t == " ":
+            if len(token) > 1:
+                vector += "{" + token + "}"
+            else:
+                vector += token
+            token = ""
+        else:
+            token += "x"
+    if len(token) > 1:
+        vector += "{" + token + "}"
+    else:
+        vector += token
+    return vector
 
 
 def read_data(all_data_tsv, languages, concepts):
@@ -100,6 +133,8 @@ def read_data(all_data_tsv, languages, concepts):
     all_data = [[[] for l in languages]
                 for c in concepts]
 
+    missing_languages = languages_rl.copy()
+
     for row in csv.DictReader(all_data_tsv, dialect='excel-tab'):
         try:
             c = concepts_rl[row["CONCEPT_ID"]]
@@ -115,10 +150,22 @@ def read_data(all_data_tsv, languages, concepts):
                 continue
         try:
             l = languages_rl[row["DOCULECT_ID"]]
+            missing_languages.pop(row["DOCULECT_ID"], None)
         except KeyError:
             pass
-        all_data[c][l].append(row["ALIGNMENT"])
+        all_data[c][l].append({
+            "datum": row["IPA"].lstrip("*"),
+            "tag": row["COGID"],
+            "vector": alignment_to_vector(row["ALIGNMENT"])})
+        
+    # for language, index in sorted(empty.items(), key=lambda x: x[1],
+    #                               reverse=True):
+    #     del languages[index]
+    #     for concept in data:
+    #         del concept[index]
+    
     return all_data
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -154,13 +201,24 @@ if __name__ == '__main__':
         "famname": surname,
         "name": givenname,
         "affiliations": "None",
-        "email": givenname + "@None"}
+        "email": givenname + "@None",
+        "creatorrole": "compiler"}
 
     collection_data = read_collection_metadata(args.collection)
 
+    if not collection_data["glosslanguage1"]:
+        collection_data["glosslanguage1"] = "English"
+        collection_data["lgcode1"] = "eng"
+    if not collection_data["glosslanguage2"]:
+        collection_data["glosslanguage2"] = "Indonesian"
+        collection_data["lgcode2"] = "ind"
+
     languages = read_language_metadata(args.languages)
 
-    concepts, gloss1, gloss2 = read_concept_metadata(args.concepts)
+    concepts, gloss1, gloss2 = read_concept_metadata(
+        args.concepts,
+        glosses=[collection_data["glosslanguage1"],
+                 collection_data["glosslanguage2"]])
 
     data = read_data(args.data, languages, concepts)
 
