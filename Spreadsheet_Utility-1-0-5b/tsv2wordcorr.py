@@ -171,7 +171,7 @@ def read_data_from_sprlist(sprlist1):
     return entries, gloss1, gloss2, data
 
 
-def write_xml(outp, userdata, collection, varietyproperties, entries, gloss1, gloss2, forms):
+def write_xml(outp, userdata, collection, varietyproperties, entries, gloss1, gloss2, forms, results=None):
     # header information:
     encoding = '<?xml version="1.0" encoding="UTF-8"?>\n'
     # print encoding
@@ -342,7 +342,7 @@ def write_xml(outp, userdata, collection, varietyproperties, entries, gloss1, gl
             for k, form in enumerate(forms[i][l]):
                 if form:
                     datum = '                <datum datum-number="%(no)s" short-name="%(varshortn)s" datum="%(datm)s">\n' %\
-                        {'no': i+k+m+l,
+                        {'no': m,
                          'varshortn': var["shortname"],
                          'datm': form["datum"].replace("<", "&lt;").replace(">", "&gt;")}
                     outp.write(datum)   # .encode('utf-8'))   # encode as unicode
@@ -353,7 +353,7 @@ def write_xml(outp, userdata, collection, varietyproperties, entries, gloss1, gl
                         </annotated-datum>
                         """.format(conceptid=entry,
                                    tag=form.get("tag", "?"),
-                                   no=i+k+m+l,
+                                   no=m,
                                    xs=form.get("vector", "x"*len(form))))
                     # special semantics of datum
                     specsem = '                    <special-semantics />\n'
@@ -366,7 +366,7 @@ def write_xml(outp, userdata, collection, varietyproperties, entries, gloss1, gl
                     # close datum
                     datcls = '                </datum>\n'
                     outp.write(datcls)
-        m=m+(len(varietyproperties)-1)   # m=m+(len(varieties)-1)   
+                    m += 1
     # *********VARx DATA closed***************
 
     # close entry
@@ -411,7 +411,8 @@ def write_xml(outp, userdata, collection, varietyproperties, entries, gloss1, gl
     outp.write(annop)
 
     # results (Refine)
-    results = '                  <results />\n'
+    if results is None:
+        results = '                  <results />\n'
     # print results
     outp.write(results)
 

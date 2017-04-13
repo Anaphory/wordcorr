@@ -8,11 +8,17 @@ in the format used for WordCorr backup/exchange.
 
 """
 
+import itertools
+import collections
+
 import sys
 import argparse
 
-import csv
 import json
+import pandas
+import xml.etree.cElementTree as ET
+
+from soundcorrespondences import correspondences
 
 from tsv2wordcorr import write_xml
 
@@ -26,7 +32,8 @@ def read_language_metadata(tsvfile):
 
     """
     varieties = []
-    for variety in csv.DictReader(tsvfile, dialect="excel-tab"):
+    for v, variety in pandas.read_csv(
+            tsvfile, sep="\t", keep_default_na=False, na_values=[]).iterrows():
         varieties.append({
             "ethnologue": variety["ISO_code"],
             "name": variety["Language name (-dialect)"].strip(),
@@ -58,7 +65,8 @@ def read_concept_metadata(tsvfile, glosses=["English", "Indonesian"]):
     entries = []
     gloss1 = []
     gloss2 = []
-    for concept in csv.DictReader(tsvfile, dialect="excel-tab"):
+    for c, concept in pandas.read_csv(
+            tsvfile, sep="\t", keep_default_na=False, na_values=[]).iterrows():
         entries.append(concept["Concept ID"])
         gloss1.append(concept[glosses[0]])
         gloss2.append(concept[glosses[1]])
@@ -97,11 +105,19 @@ def alignment_to_vector(alignment_string):
     '/x{xx}/x{xx}x'
     >>> alignment_to_vector("b u l aN")
     'xxx{xx}'
+    >>> alignment_to_vector("* u l aN")
+    'xx{xx}'
 
     """
     vector = ""
     token = ""
     for t in alignment_string.strip():
+        if t == "*":
+            # Ignore *initial* 'reconstructed' markers
+            if vector.strip("/"):
+                token += "x"
+            else:
+                continue
         if t == "-":
             token = "/"
         elif t == " ":
@@ -135,7 +151,9 @@ def read_data(all_data_tsv, languages, concepts):
 
     missing_languages = languages_rl.copy()
 
-    for row in csv.DictReader(all_data_tsv, dialect='excel-tab'):
+    data = pandas.read_csv(
+        all_data_tsv, sep="\t", keep_default_na=False, na_values=[])
+    for r, row in data.iterrows():
         try:
             c = concepts_rl[row["CONCEPT_ID"]]
         except KeyError:
@@ -152,19 +170,75 @@ def read_data(all_data_tsv, languages, concepts):
             l = languages_rl[row["DOCULECT_ID"]]
             missing_languages.pop(row["DOCULECT_ID"], None)
         except KeyError:
-            pass
+            continue
         all_data[c][l].append({
             "datum": row["IPA"].lstrip("*"),
             "tag": row["COGID"],
             "vector": alignment_to_vector(row["ALIGNMENT"])})
-        
-    # for language, index in sorted(empty.items(), key=lambda x: x[1],
-    #                               reverse=True):
-    #     del languages[index]
-    #     for concept in data:
-    #         del concept[index]
-    
-    return all_data
+
+    sound_correspondences = correspondences(
+        data, data["DOCULECT_ID"].unique(),
+        "DOCULECT_ID", "ALIGNMENT", "COGID")
+
+    return all_data, sound_correspondences
+
+
+def correspondences_tag(soundcorrespondences):
+    """Generate a wordcorr <results/> tag for sound correspondences.
+
+    Given a {correspondence-tuple: ()} dict of sound correspondences,
+    create an ElementTree object representing the <results> tag for a
+    WordCorr XML representing these sound correspondences, each as a
+    separate proto-segment.
+
+    """
+    xresults = ET.Element("results")
+    protosegments = {}
+    for correspondence, occurrences in soundcorrespondences.items():
+        print(correspondence)
+        protosegment = collections.Counter(correspondence)
+        protosegment[None] = 0
+        protosegment["-"] = 0
+        protosegment, n = protosegment.most_common(1)[0]
+        p = protosegments[protosegment] = protosegments.get(
+            protosegment, -1) + 1
+        protosegment = "{:}{:d}".format(protosegment, p)
+        glyphs = []
+        ignore = 0
+        glyph_count = 0
+        for c in correspondence:
+            if c is None:
+                glyphs.append(".")
+                ignore += 1
+            elif c == "-":
+                glyphs.append("/")
+            elif len(c) == 1:
+                glyphs.append(c)
+                glyph_count += 1
+            else:
+                glyphs.append("{"+c+"}")
+                glyph_count += 1
+        xsegment = ET.SubElement(xresults, "protosegment",
+                                 symbol=protosegment,
+                                 zone_row=str(1),
+                                 zone_column=str(1))
+        xcluster = ET.SubElement(xsegment, "cluster",
+                                 environment="_",
+                                 cluster_order=str(1))
+        xcorrespondenceset = ET.SubElement(xcluster, "correspondence-set",
+                                           ignore_count=str(ignore),
+                                           glyph_count=str(glyph_count),
+                                           order=str(1))
+        ET.SubElement(xcorrespondenceset, "remarks")
+        ET.SubElement(
+            xcorrespondenceset, "glyph-string").text = "".join(glyphs)
+        for concept, cognateclass, position in occurrences:
+            print(concept, cognateclass, position)
+            ET.SubElement(xcorrespondenceset, "citation",
+                          entry_number=str(concepts[gloss1.index(concept)]),
+                          tag=str(cognateclass),
+                          glyph_position=str(position))
+    return xresults
 
 
 if __name__ == '__main__':
@@ -215,12 +289,38 @@ if __name__ == '__main__':
 
     languages = read_language_metadata(args.languages)
 
+    #SORT THIS ALPHABETICALLY?
     concepts, gloss1, gloss2 = read_concept_metadata(
         args.concepts,
         glosses=[collection_data["glosslanguage1"],
                  collection_data["glosslanguage2"]])
 
-    data = read_data(args.data, languages, concepts)
+    data, soundcorrespondences = read_data(args.data, languages, concepts)
+
+    xresults = correspondences_tag(soundcorrespondences)
 
     write_xml(args.output, user_data, collection_data, languages,
-              concepts, gloss1, gloss2, data)
+              concepts, gloss1, gloss2, data,
+              ET.tostring(xresults, encoding='unicode').replace("_", "-"))
+
+    print("File generated.")
+    import networkx as nx
+    g = nx.Graph()
+    for (c1, sc1), (c2, sc2) in itertools.combinations(
+            soundcorrespondences.items(), 2):
+        if len([c for c in c1 if c]) < 6:
+            continue
+        if len([c for c in c2 if c]) < 6:
+            continue
+        if {(concept, cogid)
+            for (concept, cogid, pos) in sc1} & {
+                    (concept, cogid)
+                    for (concept, cogid, pos) in sc2}:
+            g.add_edge(c1, c2)
+        if all([((p1 is None) or (p1 == p2)
+                for p1, p2 in zip(c1, c2))]) or all([
+                        (p2 is None) or (p1 == p2)
+                        for p1, p2 in zip(c1, c2)]):
+            g.add_edge(c1, c2)
+    print("Graph calculated.")
+    nx.draw(g)
