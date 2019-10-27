@@ -306,21 +306,24 @@ if __name__ == '__main__':
     print("File generated.")
     import networkx as nx
     g = nx.Graph()
-    for (c1, sc1), (c2, sc2) in itertools.combinations(
-            soundcorrespondences.items(), 2):
-        if len([c for c in c1 if c]) < 6:
-            continue
-        if len([c for c in c2 if c]) < 6:
-            continue
-        if {(concept, cogid)
-            for (concept, cogid, pos) in sc1} & {
-                    (concept, cogid)
-                    for (concept, cogid, pos) in sc2}:
-            g.add_edge(c1, c2)
-        if all([((p1 is None) or (p1 == p2)
-                for p1, p2 in zip(c1, c2))]) or all([
-                        (p2 is None) or (p1 == p2)
-                        for p1, p2 in zip(c1, c2)]):
-            g.add_edge(c1, c2)
+    try:
+        for (c1, sc1), (c2, sc2) in itertools.combinations(
+                soundcorrespondences.items(), 2):
+            if len([c for c in c1 if c]) < 40:
+                continue
+            if len([c for c in c2 if c]) < 40:
+                continue
+            if {(concept, cogid)
+                for (concept, cogid, pos) in sc1} & {
+                        (concept, cogid)
+                        for (concept, cogid, pos) in sc2}:
+                g.add_edge(c1, c2)
+            if all([((p1 is None) or (p1 == p2)
+                    for p1, p2 in zip(c1, c2))]) or all([
+                            (p2 is None) or (p1 == p2)
+                            for p1, p2 in zip(c1, c2)]):
+                g.add_edge(c1, c2)
+    except KeyboardInterrupt:
+        pass
     print("Graph calculated.")
     nx.draw(g)
